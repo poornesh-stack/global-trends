@@ -9,6 +9,7 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <h1>Welcome</h1>
       </Routes>
     </>
   );
