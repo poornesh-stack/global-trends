@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 const drawerWidth = 240;
 const appbarWidth = 70;
 
-export default function Dashboard() {
+export default function Converter() {
   return (
     <Box
       sx={{
@@ -12,7 +12,7 @@ export default function Dashboard() {
         mt: `${appbarWidth}px`,
       }}
     >
-      <h1>Welcome to Dashboard Page</h1>
+      <h1>Welcome to Converter Page</h1>
     </Box>
   );
 }

@@ -1,49 +1,109 @@
 import {
+  AccountCircle,
+  AttachMoneyOutlined,
   CurrencyBitcoin,
-  CurrencyExchange,
-  Dashboard,
-  ShowChart,
+  CurrencyExchangeOutlined,
+  DashboardOutlined,
+  SearchOutlined,
+  ShowChartOutlined,
 } from "@mui/icons-material";
 import {
+  alpha,
+  AppBar,
   Box,
+  Divider,
   Drawer,
+  IconButton,
+  InputBase,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
+  styled,
   Toolbar,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const drawerWidth = 240;
+
+const menuItem = [
+  { text: "Dashboard", icon: <DashboardOutlined />, path: "/" },
+  { text: "Stocks", icon: <AttachMoneyOutlined />, path: "/stocks" },
+  { text: "Cryptocurrencies", icon: <CurrencyBitcoin />, path: "/cryptocurrencies" },
+  { text: "Converter", icon: <CurrencyExchangeOutlined />, path: "/converter" },
+];
 
 export default function PermanentDrawer() {
-  const drawerWidth = 240;
-  const navItems = [
-    { text: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
-    { text: "Cryptocurrencies", icon: <CurrencyBitcoin /> },
-    { text: "Stocks", icon: <ShowChart /> },
-    { text: "Converter", icon: <CurrencyExchange /> },
-  ];
+  const settings = ["Profile", "Account", "Dashboard", "Logout"];
+  const [anchorElUser, setAnchorElUser] = useState(null);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const Search = styled("div")(({ theme }) => ({
+    position: "relative",
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    border: `1px solid ${theme.palette.grey[400]}`,
+    "&:hover": {
+      backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginLeft: 0,
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      marginLeft: theme.spacing(1),
+      width: "auto",
+    },
+  }));
+
+  const SearchIconWrapper = styled("div")(({ theme }) => ({
+    padding: theme.spacing(0, 1),
+    height: "100%",
+    position: "absolute",
+    pointerEvents: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }));
+
+  const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: "inherit",
+    width: "15rem",
+    "& .MuiInputBase-input": {
+      padding: theme.spacing(1, 3, 1, 0),
+      paddingLeft: `calc(1em + ${theme.spacing(3)})`,
+      transition: theme.transitions.create("width"),
+      width: "100%",
+      "&::placeholder": {
+        color: "#555555",
+        opacity: 1,
+      },
+    },
+  }));
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            backgroundColor: " #222",
-            color: " #fff",
-          },
-        }}
-        variant="permanent"
-        anchor="left"
+      <AppBar
+        position="fixed"
+        color=" #f0f0f0"
+        elevation={0}
+        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
       >
-        <Toolbar />
-        <Box sx={{ px: 2, mb: 2 }}>
+        <Toolbar>
           <Typography
             variant="h6"
             noWrap
@@ -54,26 +114,103 @@ export default function PermanentDrawer() {
               letterSpacing: ".1rem",
               color: "inherit",
               textDecoration: "none",
-              textAlign: "center",
+            }}
+          >
+            MarketPulse
+          </Typography>
+
+          <Box sx={{ flexGrow: 1 }} />
+          <Search sx={{ marginRight: 2, borderRadius: 2.5 }}>
+            <SearchIconWrapper>
+              <SearchOutlined sx={{ color: " #555" }} />
+            </SearchIconWrapper>
+            <StyledInputBase placeholder="Search" inputProps={{ "aria-label": "search" }} />
+          </Search>
+
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title="Open settings">
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <AccountCircle sx={{ fontSize: 40 }} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              sx={{ mt: "45px" }}
+              id="menu-appbar"
+              anchorEl={anchorElUser}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+            >
+              {settings.map((setting) => (
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <Typography sx={{ textAlign: "center" }}>{setting}</Typography>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          "& .MuiDrawer-paper": {
+            width: drawerWidth,
+            boxSizing: "border-box",
+            backgroundColor: "#000000",
+            color: "#ffffff",
+          },
+        }}
+        variant="permanent"
+        anchor="left"
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            height: 32,
+            padding: 2,
+          }}
+        >
+          <ShowChartOutlined sx={{ marginRight: 1 }} />
+          <Typography
+            variant="h6"
+            noWrap
+            sx={{
+              color: "#ffffff",
+              fontFamily: "sans-serif",
+              fontWeight: 700,
+              letterSpacing: ".1rem",
+              color: "inherit",
+              textDecoration: "none",
             }}
           >
             MarketPulse
           </Typography>
         </Box>
+        <Divider sx={{ backgroundColor: "#ffffff" }} />
         <List>
-          {navItems.map(({ text, icon, path }) => (
+          {menuItem.map(({ text, icon, path }) => (
             <ListItem key={text} disablePadding>
               <ListItemButton
-                component={NavLink}
-                to={path || "#"}
-                className={({ isActive }) => (isActive ? "active" : "")}
-                // sx={{
-                //   "&.active": {
-                //     backgroundColor: "rgba(255, 255, 255, 0.2)",
-                //   },
-                // }}
+                onClick={() => navigate(path)}
+                selected={location.pathname === path}
+                sx={{
+                  "&:hover": { backgroundColor: "#1a1a1a" },
+                  "&.Mui-selected": { backgroundColor: "#161a9d", fontWeight: "bold" },
+                }}
               >
-                <ListItemIcon sx={{ color: "#fff" }}>{icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: "#ffffff" }}>{icon}</ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>
             </ListItem>
