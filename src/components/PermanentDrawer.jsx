@@ -182,7 +182,7 @@ export default function PermanentDrawer() {
             padding: 2,
           }}
         >
-          <ShowChartOutlined sx={{ marginRight: 1 }} />
+          <ShowChartOutlined sx={{ marginRight: 2 }} />
           <Typography
             variant="h6"
             noWrap
