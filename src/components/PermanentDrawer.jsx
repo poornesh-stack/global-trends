@@ -98,7 +98,7 @@ export default function PermanentDrawer() {
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
-        position="fixed"
+        position="absolute"
         color=" #f0f0f0"
         elevation={0}
         sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}

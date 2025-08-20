@@ -10,6 +10,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -22,6 +23,8 @@ const appbarWidth = 70;
 
 export default function Dashboard() {
   const [listData, setListData] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     loadGetApi();
@@ -32,12 +35,21 @@ export default function Dashboard() {
       .get(`https://api.coinlore.net/api/tickers/`)
       .then((res) => {
         console.log(res, "Crypto Data");
-        // setListData(res .data);
+        setListData(res.data.data);
       })
       .catch((err) => {
         Swal.fire("Error occurred while fetching the data", "", "error");
       });
   }
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Box
@@ -47,14 +59,13 @@ export default function Dashboard() {
         mt: `${appbarWidth}px`,
       }}
     >
-      {/* <h1>Welcome to Dashboard Page</h1> */}
       <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2 }}>
         <CardContent>
           <Typography variant="h5" component="div">
             Cryptocurrencies
           </Typography>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
+          <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }} elevation="0">
+            <Table stickyHeader>
               <TableHead>
                 <TableRow
                   key={"header-key"}
@@ -62,14 +73,78 @@ export default function Dashboard() {
                 >
                   {["#", "Name", "Price", "24h", "1h", "7d", "24h Market Cap", "24h Volume"].map(
                     (h) => (
-                      <TableCell key={h}>{h}</TableCell>
+                      <TableCell key={h} lign="center" sx={{ fontWeight: "bold", borderBottom: 1 }}>
+                        {h}
+                      </TableCell>
                     )
                   )}
                 </TableRow>
               </TableHead>
-              <TableBody></TableBody>
+              <TableBody>
+                {listData
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((coin, index) => {
+                    const getChangeColor = (value) => (parseFloat(value) >= 0 ? "green" : "red");
+
+                    return (
+                      <TableRow key={coin.id} hover>
+                        <TableCell align="center" sx={{ borderBottom: "none" }}>
+                          {page * rowsPerPage + index + 1}
+                        </TableCell>
+                        <TableCell align="center" sx={{ borderBottom: "none" }}>
+                          {coin.name}
+                        </TableCell>
+                        <TableCell align="center" sx={{ borderBottom: "none" }}>
+                          ${parseFloat(coin.price_usd).toFixed(2)}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: getChangeColor(coin.percent_change_24h),
+                            borderBottom: "none",
+                          }}
+                        >
+                          {coin.percent_change_24h}%
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: getChangeColor(coin.percent_change_1h),
+                            borderBottom: "none",
+                          }}
+                        >
+                          {coin.percent_change_1h}%
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{
+                            color: getChangeColor(coin.percent_change_7d),
+                            borderBottom: "none",
+                          }}
+                        >
+                          {coin.percent_change_7d}%
+                        </TableCell>
+                        <TableCell align="center" sx={{ borderBottom: "none" }}>
+                          ${parseFloat(coin.market_cap_usd).toLocaleString()}
+                        </TableCell>
+                        <TableCell align="center" sx={{ borderBottom: "none" }}>
+                          ${parseFloat(coin.volume24).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
             </Table>
           </TableContainer>
+          <TablePagination
+            component="div"
+            count={listData.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+          />
         </CardContent>
       </Card>
     </Box>
