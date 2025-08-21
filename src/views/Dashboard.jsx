@@ -1,8 +1,6 @@
 import {
   Box,
-  Button,
   Card,
-  CardActions,
   CardContent,
   Paper,
   Table,
@@ -28,6 +26,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadGetApi();
+
+    const interval = setInterval(() => {
+      loadGetApi();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, []);
 
   function loadGetApi() {
@@ -57,14 +61,27 @@ export default function Dashboard() {
         width: `calc(100% - ${drawerWidth}px)`,
         ml: `${drawerWidth}px`,
         mt: `${appbarWidth}px`,
+        display: "flex",
+        gap: 2,
+        flexWrap: "wrap",
       }}
     >
-      <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2 }}>
+      <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2, maxHeight: 500 }}>
         <CardContent>
-          <Typography variant="h5" component="div">
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{
+              fontFamily: "sans-serif",
+              fontWeight: 500,
+              letterSpacing: ".1rem",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
             Cryptocurrencies
           </Typography>
-          <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 400 }} elevation="0">
+          <TableContainer component={Paper} sx={{ mt: 2, height: 350 }} elevation="0">
             <Table stickyHeader>
               <TableHead>
                 <TableRow
@@ -145,6 +162,30 @@ export default function Dashboard() {
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[5, 10, 25, 50]}
           />
+        </CardContent>
+      </Card>
+
+      <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2, maxHeight: 500 }}>
+        <CardContent>
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{
+              fontFamily: "sans-serif",
+              fontWeight: 500,
+              letterSpacing: ".1rem",
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            Bitcoin Price History
+          </Typography>
+        </CardContent>
+      </Card>
+
+      <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2, maxHeight: 500 }}>
+        <CardContent>
+          <h1>Card 3</h1>
         </CardContent>
       </Card>
     </Box>
