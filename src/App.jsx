@@ -2,9 +2,9 @@ import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./views/Dashboard";
 import PermanentDrawer from "./components/PermanentDrawer";
-import Stocks from "./views/Stocks";
-import Cryptocurrencies from "./views/Cryptocurrencies";
-import Converter from "./views/Converter";
+import Crypto from "./views/Crypto";
+import Currency from "./views/Currency";
+import Weather from "./views/Weather";
 
 export default function App() {
   return (
@@ -12,9 +12,9 @@ export default function App() {
       <PermanentDrawer />
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/stocks" element={<Stocks />} />
-        <Route path="/cryptocurrencies" element={<Cryptocurrencies />} />
-        <Route path="/converter" element={<Converter />} />
+        <Route path="/crypto" element={<Crypto />} />
+        <Route path="/currency" element={<Currency />} />
+        <Route path="/weather" element={<Weather />} />
       </Routes>
     </>
   );

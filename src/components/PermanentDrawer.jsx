@@ -1,107 +1,48 @@
 import {
-  AccountCircle,
   AttachMoneyOutlined,
-  CurrencyBitcoin,
+  CloudOutlined,
   CurrencyExchangeOutlined,
   DashboardOutlined,
-  SearchOutlined,
-  ShowChartOutlined,
 } from "@mui/icons-material";
 import {
-  alpha,
   AppBar,
   Box,
+  Button,
   Divider,
   Drawer,
-  IconButton,
-  InputBase,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
-  styled,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const drawerWidth = 240;
 
 const menuItem = [
   { text: "Dashboard", icon: <DashboardOutlined />, path: "/" },
-  { text: "Stocks", icon: <AttachMoneyOutlined />, path: "/stocks" },
-  { text: "Cryptocurrencies", icon: <CurrencyBitcoin />, path: "/cryptocurrencies" },
-  { text: "Converter", icon: <CurrencyExchangeOutlined />, path: "/converter" },
+  { text: "Crypto", icon: <AttachMoneyOutlined />, path: "/crypto" },
+  { text: "Currency", icon: <CurrencyExchangeOutlined />, path: "/currency" },
+  { text: "Weather", icon: <CloudOutlined />, path: "/weather" },
 ];
 
 export default function PermanentDrawer() {
-  const settings = ["Profile", "Account", "Dashboard", "Logout"];
-  const [anchorElUser, setAnchorElUser] = useState(null);
-
   const navigate = useNavigate();
   const location = useLocation();
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
-  const Search = styled("div")(({ theme }) => ({
-    position: "relative",
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    border: `1px solid ${theme.palette.grey[400]}`,
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(1),
-      width: "auto",
-    },
-  }));
-
-  const SearchIconWrapper = styled("div")(({ theme }) => ({
-    padding: theme.spacing(0, 1),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    width: "15rem",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 3, 1, 0),
-      paddingLeft: `calc(1em + ${theme.spacing(3)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      "&::placeholder": {
-        color: "#555555",
-        opacity: 1,
-      },
-    },
-  }));
 
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar
-        position="absolute"
-        color=" #f0f0f0"
+        position="fixed"
         elevation={0}
-        sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}
+        sx={{
+          width: `calc(100% - ${drawerWidth}px)`,
+          ml: `${drawerWidth}px`,
+          backgroundColor: "#000053",
+        }}
       >
         <Toolbar>
           <Typography
@@ -116,46 +57,13 @@ export default function PermanentDrawer() {
               textDecoration: "none",
             }}
           >
-            MarketPulse
+            Global Trends
           </Typography>
-
-          <Box sx={{ flexGrow: 1 }} />
-          <Search sx={{ marginRight: 2, borderRadius: 2.5 }}>
-            <SearchIconWrapper>
-              <SearchOutlined sx={{ color: " #555" }} />
-            </SearchIconWrapper>
-            <StyledInputBase placeholder="Search" inputProps={{ "aria-label": "search" }} />
-          </Search>
-
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <AccountCircle sx={{ fontSize: 40 }} />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: "center" }}>{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          <div style={{ marginLeft: "auto" }}>
+            <Button color="inherit">About</Button>
+            <Button color="inherit">Contact</Button>
+            <Button color="inherit">Login</Button>
+          </div>
         </Toolbar>
       </AppBar>
 
@@ -166,7 +74,7 @@ export default function PermanentDrawer() {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
-            backgroundColor: "#000000",
+            backgroundColor: "#000068",
             color: "#ffffff",
           },
         }}
@@ -178,26 +86,12 @@ export default function PermanentDrawer() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            position: "relative",
             height: 32,
             padding: 2,
+            overflow: "visible",
           }}
-        >
-          <ShowChartOutlined sx={{ marginRight: 2 }} />
-          <Typography
-            variant="h6"
-            noWrap
-            sx={{
-              color: "#ffffff",
-              fontFamily: "sans-serif",
-              fontWeight: 700,
-              letterSpacing: ".1rem",
-              color: "inherit",
-              textDecoration: "none",
-            }}
-          >
-            MarketPulse
-          </Typography>
-        </Box>
+        ></Box>
         <Divider sx={{ backgroundColor: "#ffffff" }} />
         <List>
           {menuItem.map(({ text, icon, path }) => (
@@ -206,8 +100,8 @@ export default function PermanentDrawer() {
                 onClick={() => navigate(path)}
                 selected={location.pathname === path}
                 sx={{
-                  "&:hover": { backgroundColor: "#1a1a1a" },
-                  "&.Mui-selected": { backgroundColor: "#161a9d", fontWeight: "bold" },
+                  "&:hover": { backgroundColor: "#6a6a6a" },
+                  "&.Mui-selected": { backgroundColor: "#000000", fontWeight: "bold" },
                 }}
               >
                 <ListItemIcon sx={{ color: "#ffffff" }}>{icon}</ListItemIcon>

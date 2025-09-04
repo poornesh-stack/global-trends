@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 const drawerWidth = 240;
 const appbarWidth = 70;
 
-export default function Cryptocurrencies() {
+export default function Weather() {
   return (
     <Box
       sx={{
@@ -12,7 +12,7 @@ export default function Cryptocurrencies() {
         mt: `${appbarWidth}px`,
       }}
     >
-      <h1>Welcome to Cryptocurrencies Page</h1>
+      <h1>Welcome to Weather Page</h1>
     </Box>
   );
 }

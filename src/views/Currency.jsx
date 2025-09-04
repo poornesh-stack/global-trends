@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 const drawerWidth = 240;
 const appbarWidth = 70;
 
-export default function Stocks() {
+export default function Currency() {
   return (
     <Box
       sx={{
@@ -12,7 +12,7 @@ export default function Stocks() {
         mt: `${appbarWidth}px`,
       }}
     >
-      <h1>Welcome to Stocks Page</h1>
+      <h1>Welcome to Currency Page</h1>
     </Box>
   );
 }
