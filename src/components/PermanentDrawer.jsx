@@ -41,7 +41,7 @@ export default function PermanentDrawer() {
         sx={{
           width: `calc(100% - ${drawerWidth}px)`,
           ml: `${drawerWidth}px`,
-          backgroundColor: "#000053",
+          backgroundColor: "#000068",
         }}
       >
         <Toolbar>
@@ -87,12 +87,12 @@ export default function PermanentDrawer() {
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
-            height: 32,
+            height: 22,
             padding: 2,
             overflow: "visible",
           }}
         ></Box>
-        <Divider sx={{ backgroundColor: "#ffffff" }} />
+        {/* <Divider sx={{ backgroundColor: "#ffffff" }} /> */}
         <List>
           {menuItem.map(({ text, icon, path }) => (
             <ListItem key={text} disablePadding>
