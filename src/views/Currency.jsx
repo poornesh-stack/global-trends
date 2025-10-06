@@ -9,9 +9,10 @@ import {
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import CurrencyLineGraph from "../components/CurrencyLineGraph";
+import LoadingCard from "../utils/LoadingCard";
 
 const drawerWidth = 240;
 const appbarWidth = 70;
@@ -27,6 +28,9 @@ export default function Currency() {
   const [amount2, setAmount2] = useState("");
 
   const [activeInput, setActiveInput] = useState("amount1");
+
+  const [loading, setLoading] = useState({ names: true, rates: true });
+  const hasLoadedOnce = useRef(false);
 
   const allowedCurrencies = [
     "afn",
@@ -178,6 +182,12 @@ export default function Currency() {
   }, [currency1]);
 
   useEffect(() => {
+    if (!hasLoadedOnce.current && !loading.names && !loading.rates) {
+      hasLoadedOnce.current = true;
+    }
+  }, [loading]);
+
+  useEffect(() => {
     if (!currency1 || !currency2 || !rates[currency2]) return;
 
     if (activeInput === "amount1") {
@@ -188,6 +198,7 @@ export default function Currency() {
   }, [amount1, amount2, currency1, currency2, rates, activeInput]);
 
   function loadGetCurrencyName() {
+    setLoading((prev) => ({ ...prev, names: true }));
     axios
       .get(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json`)
       .then((res) => {
@@ -197,13 +208,16 @@ export default function Currency() {
           name,
         }));
         setCurrencies(currencyList);
+        setLoading((prev) => ({ ...prev, names: false }));
       })
       .catch((err) => {
+        setLoading((prev) => ({ ...prev, names: false }));
         Swal.fire("Error fetching Currency Names.", "", "error");
       });
   }
 
   function loadGetCurrencyRate() {
+    setLoading((prev) => ({ ...prev, rates: true }));
     axios
       .get(
         `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency1}.json`
@@ -211,11 +225,15 @@ export default function Currency() {
       .then((res) => {
         console.log(res.data, "Currency Rates");
         setRates(res.data[currency1]);
+        setLoading((prev) => ({ ...prev, rates: false }));
       })
       .catch((err) => {
+        setLoading((prev) => ({ ...prev, rates: false }));
         Swal.fire("Error fetching Currency Rates.", "", "error");
       });
   }
+
+  const showInitialLoader = !hasLoadedOnce.current && (loading.names || loading.rates);
 
   return (
     <Box
@@ -227,9 +245,10 @@ export default function Currency() {
         flexDirection: "column",
         gap: 2,
         alignItems: "center",
+        mb: 3,
       }}
     >
-      <Card sx={{ width: "85vw", mt: 2, height: "100%", boxShadow: 0 }}>
+      <Card sx={{ width: "98%", mt: 2, boxShadow: 0 }}>
         <CardContent>
           <Typography
             variant="h5"
@@ -247,155 +266,171 @@ export default function Currency() {
           </Typography>
 
           <Divider sx={{ color: "#333333", mb: 2 }} />
-
-          <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
-            <Box sx={{ flex: 1 }}>
-              <Box sx={{ justifyItems: "center" }}>
-                <Typography
-                  variant="subtitle1"
-                  component="div"
-                  sx={{
-                    fontFamily: `"Roboto Slab", serif`,
-                    fontWeight: 700,
-                    fontSize: "1.1rem",
-                    letterSpacing: ".08rem",
-                    color: "text.primary",
-                    mb: 3,
-                    mt: 2,
-                  }}
-                >
-                  {formatNumber(amount1)} {currency1Name} equals{" "}
-                  <Box
-                    component="div"
-                    sx={{
-                      fontWeight: "bold",
-                      fontSize: "1.7rem",
-                      color: "secondary.primary",
-                    }}
-                  >
-                    {formatNumber(amount2)} {currency2Name}
-                  </Box>
-                </Typography>
-              </Box>
-
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid #444444",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    width: "350px",
-                  }}
-                >
-                  <Box sx={{ width: "150px" }}>
-                    <InputBase
-                      value={amount1}
-                      onChange={(e) => {
-                        setAmount1(e.target.value);
-                        setActiveInput("amount1");
-                      }}
-                      sx={{
-                        px: 2,
-                        py: 1,
-                        flex: 1,
-                        color: "inherit",
-                        input: { textAlign: "left" },
-                      }}
-                    />
-                  </Box>
-                  <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
-                  <Select
-                    value={currency1}
-                    onChange={(e) => setCurrency1(e.target.value)}
-                    sx={{
-                      flex: 1,
-                      color: "inherit",
-                      ml: 1,
-                      "& .MuiSelect-icon": { color: "#aaa" },
-                      "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                      backgroundColor: "transparent",
-                      textAlign: "right",
-                    }}
-                    variant="standard"
-                    disableUnderline
-                  >
-                    {currencies
-                      .filter((c) => allowedCurrencies.includes(c.code))
-                      .map((c) => (
-                        <MenuItem key={c.code} value={c.code}>
-                          {c.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    border: "1px solid #444444",
-                    borderRadius: 2,
-                    overflow: "hidden",
-                    width: "350px",
-                  }}
-                >
-                  <Box sx={{ width: "150px" }}>
-                    <InputBase
-                      value={amount2}
-                      onChange={(e) => {
-                        setAmount2(e.target.value);
-                        setActiveInput("amount2");
-                      }}
-                      sx={{
-                        px: 2,
-                        py: 1,
-                        flex: 1,
-                        color: "inherit",
-                        input: { textAlign: "left" },
-                      }}
-                    />
-                  </Box>
-                  <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
-                  <Select
-                    value={currency2}
-                    onChange={(e) => setCurrency2(e.target.value)}
-                    sx={{
-                      flex: 1,
-                      color: "inherit",
-                      ml: 1,
-                      "& .MuiSelect-icon": { color: "#aaa" },
-                      "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-                      backgroundColor: "transparent",
-                      textAlign: "right",
-                    }}
-                    variant="standard"
-                    disableUnderline
-                  >
-                    {currencies
-                      .filter((c) => allowedCurrencies.includes(c.code))
-                      .map((c) => (
-                        <MenuItem key={c.code} value={c.code}>
-                          {c.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </Box>
-              </Box>
-            </Box>
-
-            <Box
-              sx={{
-                flexWrap: "wrap",
-                display: "flex",
-              }}
-            >
-              <CurrencyLineGraph currency1={currency1} currency2={currency2} />
-            </Box>
-          </Box>
         </CardContent>
       </Card>
+
+      {showInitialLoader ? (
+        <Card sx={{ width: "98%", boxShadow: 1 }}>
+          <CardContent>
+            <LoadingCard message="Loading Currencies & Rates..." />
+          </CardContent>
+        </Card>
+      ) : (
+        <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", width: "98%" }}>
+          <Card sx={{ flex: 1, minWidth: "300px", boxShadow: 1 }}>
+            <CardContent>
+              <Box sx={{ display: "flex", gap: 3, alignItems: "center" }}>
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ justifyItems: "center" }}>
+                    <Typography
+                      variant="subtitle1"
+                      component="div"
+                      sx={{
+                        fontFamily: `"Roboto Slab", serif`,
+                        fontWeight: 700,
+                        fontSize: "1.1rem",
+                        letterSpacing: ".08rem",
+                        color: "text.primary",
+                        mb: 3,
+                        mt: 2,
+                      }}
+                    >
+                      {formatNumber(amount1)} {currency1Name} equals{" "}
+                      <Box
+                        component="div"
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "1.7rem",
+                          color: "secondary.primary",
+                        }}
+                      >
+                        {formatNumber(amount2)} {currency2Name}
+                      </Box>
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: "1px solid #444444",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        width: "350px",
+                      }}
+                    >
+                      <Box sx={{ width: "150px" }}>
+                        <InputBase
+                          value={amount1}
+                          onChange={(e) => {
+                            setAmount1(e.target.value);
+                            setActiveInput("amount1");
+                          }}
+                          sx={{
+                            px: 2,
+                            py: 1,
+                            flex: 1,
+                            color: "inherit",
+                            input: { textAlign: "left" },
+                          }}
+                        />
+                      </Box>
+                      <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
+                      <Select
+                        value={currency1}
+                        onChange={(e) => setCurrency1(e.target.value)}
+                        sx={{
+                          flex: 1,
+                          color: "inherit",
+                          ml: 1,
+                          "& .MuiSelect-icon": { color: "#aaa" },
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                          backgroundColor: "transparent",
+                          textAlign: "right",
+                        }}
+                        variant="standard"
+                        disableUnderline
+                      >
+                        {currencies
+                          .filter((c) => allowedCurrencies.includes(c.code))
+                          .map((c) => (
+                            <MenuItem key={c.code} value={c.code}>
+                              {c.name}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        border: "1px solid #444444",
+                        borderRadius: 2,
+                        overflow: "hidden",
+                        width: "350px",
+                      }}
+                    >
+                      <Box sx={{ width: "150px" }}>
+                        <InputBase
+                          value={amount2}
+                          onChange={(e) => {
+                            setAmount2(e.target.value);
+                            setActiveInput("amount2");
+                          }}
+                          sx={{
+                            px: 2,
+                            py: 1,
+                            flex: 1,
+                            color: "inherit",
+                            input: { textAlign: "left" },
+                          }}
+                        />
+                      </Box>
+                      <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
+                      <Select
+                        value={currency2}
+                        onChange={(e) => setCurrency2(e.target.value)}
+                        sx={{
+                          flex: 1,
+                          color: "inherit",
+                          ml: 1,
+                          "& .MuiSelect-icon": { color: "#aaa" },
+                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                          backgroundColor: "transparent",
+                          textAlign: "right",
+                        }}
+                        variant="standard"
+                        disableUnderline
+                      >
+                        {currencies
+                          .filter((c) => allowedCurrencies.includes(c.code))
+                          .map((c) => (
+                            <MenuItem key={c.code} value={c.code}>
+                              {c.name}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                    </Box>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    flexWrap: "wrap",
+                    display: "flex",
+                  }}
+                >
+                  <CurrencyLineGraph currency1={currency1} currency2={currency2} />
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
     </Box>
   );
 }

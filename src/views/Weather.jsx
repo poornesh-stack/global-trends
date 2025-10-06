@@ -1,70 +1,26 @@
 import { AirOutlined, SearchOutlined, WaterDropOutlined } from "@mui/icons-material";
 import {
-  alpha,
+  Autocomplete,
   Box,
   Button,
   ButtonGroup,
   Card,
   CardContent,
   Divider,
-  InputBase,
-  styled,
+  InputAdornment,
+  TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
+import WeatherAqiGauge from "../components/WeatherAqiGauge";
+import LoadingCard from "../utils/LoadingCard";
+import WeatherCompassChart from "../components/WeatherCompassChart";
 
 const drawerWidth = 240;
 const appbarWidth = 70;
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.1),
-  border: "2px solid",
-  borderColor: "#000",
-  padding: theme.spacing(0.5, 1),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.2),
-    borderColor: "#000",
-  },
-  "&:focus-within": {
-    borderColor: "#000",
-  },
-  marginLeft: 0,
-  width: "20%",
-  transition: "all 0.3s ease",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(1),
-    width: "30%",
-  },
-}));
-
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0),
-  height: "90%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "#000",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: theme.palette.text.primary,
-  width: "100%",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 6),
-    transition: theme.transitions.create("width"),
-    border: "none",
-    outline: "none",
-    "&:focus": {
-      width: "100%",
-    },
-  },
-}));
 
 function stripDecimalsFromObject(obj) {
   if (Array.isArray(obj)) {
@@ -86,11 +42,13 @@ function stripDecimalsFromObject(obj) {
 }
 
 export default function Weather() {
+  const theme = useTheme();
   const [currentWeather, setCurrentWeather] = useState([]);
   const [forecastWeather, setForecastWeather] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [tempUnit, setTempUnit] = useState("C");
   const [windUnit, setWindUnit] = useState("kmph");
+  const [suggestions, setSuggestions] = useState([]);
 
   useEffect(() => {
     getWeatherData("bangalore");
@@ -112,15 +70,46 @@ export default function Weather() {
       });
   }
 
-  function handleKeyDown(e) {
-    if (e.key === "Enter") {
-      if (searchInput.trim() !== "") {
-        getWeatherData(searchInput.trim());
-      } else {
-        Swal.fire("Please enter a city or zip code.", "", "warning");
-      }
+  const debounceRef = useRef();
+
+  function fetchSuggestions(query) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
     }
+
+    debounceRef.current = setTimeout(() => {
+      axios
+        .get(
+          `http://api.weatherapi.com/v1/search.json?key=3c788fcae868481b8f065541252909&q=${query}`
+        )
+        .then((res) => setSuggestions(res.data))
+        .catch(() => setSuggestions([]));
+    }, 250);
   }
+
+  const handleSearchChange = (event, newInputValue) => {
+    if (newInputValue !== undefined && newInputValue !== null) {
+      setSearchInput(newInputValue);
+      fetchSuggestions(newInputValue);
+    }
+  };
+
+  const handleSelect = (event, value) => {
+    if (!value) return;
+
+    if (typeof value === "string") {
+      const q = value.trim();
+      if (q) getWeatherData(q);
+      return;
+    }
+
+    if (value.name) {
+      getWeatherData(value.name);
+      return;
+    }
+  };
 
   return (
     <Box
@@ -151,18 +140,51 @@ export default function Weather() {
               Weather Forecast
             </Typography>
 
-            <Search>
-              <SearchIconWrapper>
-                <SearchOutlined />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search City or Zip Code"
-                inputProps={{ "aria-label": "search" }}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </Search>
+            <Autocomplete
+              freeSolo
+              inputValue={searchInput}
+              onChange={handleSelect}
+              onInputChange={handleSearchChange}
+              options={suggestions}
+              filterOptions={(x) => x}
+              getOptionLabel={(option) =>
+                typeof option === "string"
+                  ? option
+                  : [option?.name, option?.region, option?.country].filter(Boolean).join(", ")
+              }
+              isOptionEqualToValue={(opt, val) =>
+                (opt?.id ?? `${opt?.name}-${opt?.region}-${opt?.country}`) ===
+                (val?.id ?? `${val?.name}-${val?.region}-${val?.country}`)
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Search City or Zip Code"
+                  variant="outlined"
+                  fullWidth
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const q = (searchInput || "").trim();
+                      if (q) getWeatherData(q);
+                    }
+                  }}
+                  InputProps={{
+                    ...params.InputProps,
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchOutlined />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+              sx={{
+                width: "90%",
+                [theme.breakpoints.up("sm")]: { width: "50%" },
+                [theme.breakpoints.up("md")]: { width: "30%" },
+              }}
+            />
           </Box>
 
           <Divider sx={{ color: "#333333", mt: 2 }} />
@@ -224,61 +246,129 @@ export default function Weather() {
                   sx={{
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
                     gap: 2,
-                    flexWrap: "wrap",
+                    pt: 15,
                   }}
                 >
-                  <Box>
-                    <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                      {tempUnit === "C"
-                        ? `${currentWeather.current?.temp_c}°C`
-                        : `${currentWeather.current?.temp_f}°F`}
-                    </Typography>
-
-                    <Typography variant="body1" sx={{ mt: 1 }}>
-                      {currentWeather.current?.condition?.text}
-                    </Typography>
-
-                    {forecastWeather?.day && (
-                      <Typography variant="body2" sx={{ mt: 1, fontWeight: "medium" }}>
-                        {tempUnit === "C" ? (
-                          <>
-                            H: {forecastWeather.day.maxtemp_c}°C&nbsp;&nbsp;L:{" "}
-                            {forecastWeather.day.mintemp_c}°C
-                          </>
-                        ) : (
-                          <>
-                            H: {forecastWeather.day.maxtemp_f}°F&nbsp;&nbsp;L:{" "}
-                            {forecastWeather.day.mintemp_f}°F
-                          </>
-                        )}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 2,
+                    }}
+                  >
+                    <Box sx={{ textAlign: "center" }}>
+                      <Typography
+                        variant="h2"
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "4rem",
+                          lineHeight: "1.2",
+                        }}
+                      >
+                        {tempUnit === "C"
+                          ? `${currentWeather.current?.temp_c}°C`
+                          : `${currentWeather.current?.temp_f}°F`}
                       </Typography>
+
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          mt: 1,
+                          fontSize: "1.5rem",
+                          fontWeight: "500",
+                          color: "#555",
+                        }}
+                      >
+                        {currentWeather.current?.condition?.text}
+                      </Typography>
+                    </Box>
+
+                    {currentWeather.current?.condition?.icon && (
+                      <img
+                        src={`https:${currentWeather.current.condition.icon}`}
+                        alt="weather icon"
+                        width={80}
+                        height={80}
+                        style={{
+                          marginTop: "10px",
+                          borderRadius: "50%",
+                        }}
+                      />
                     )}
                   </Box>
 
-                  {currentWeather.current?.condition?.icon && (
-                    <img
-                      src={`https:${currentWeather.current.condition.icon}`}
-                      alt="weather icon"
-                      width={50}
-                      height={50}
-                    />
+                  {forecastWeather?.forecastday?.[0]?.day && (
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: "medium",
+                        fontSize: "1.5rem",
+                        color: "#333",
+                        paddingRight: "5.5rem",
+                      }}
+                    >
+                      {tempUnit === "C" ? (
+                        <>
+                          H: {forecastWeather.forecastday[0].day.maxtemp_c}°C&nbsp;&nbsp;L:{" "}
+                          {forecastWeather.forecastday[0].day.mintemp_c}°C
+                        </>
+                      ) : (
+                        <>
+                          H: {forecastWeather.forecastday[0].day.maxtemp_f}°F&nbsp;&nbsp;L:{" "}
+                          {forecastWeather.forecastday[0].day.mintemp_f}°F
+                        </>
+                      )}
+                    </Typography>
                   )}
 
                   <Typography
                     variant="body2"
                     sx={{
-                      ml: "auto",
-                      fontStyle: "italic",
-                      color: currentWeather.current?.is_day ? "orange" : "blue",
+                      fontWeight: 500,
+                      fontSize: "1.1rem",
+                      color: "#555",
+                      paddingRight: "5.5rem",
+                      mt: 0.5,
                     }}
                   >
-                    {currentWeather.current?.is_day ? "Day" : "Night"}
+                    Feels like:{" "}
+                    {tempUnit === "C"
+                      ? `${currentWeather?.current?.feelslike_c ?? "—"}°C`
+                      : `${currentWeather?.current?.feelslike_f ?? "—"}°F`}
                   </Typography>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      width: "100%",
+                      borderRadius: "8px",
+                      padding: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontStyle: "italic",
+                        color: "#fff",
+                        fontSize: "1.2rem",
+                        fontWeight: "500",
+                        letterSpacing: "0.5px",
+                        zIndex: 10,
+                      }}
+                    >
+                      {currentWeather.current?.is_day ? "Day" : "Night"}
+                    </Typography>
+                  </Box>
                 </Box>
               </>
             ) : (
-              <Typography>Loading current weather...</Typography>
+              <LoadingCard message="Loading Current Weather..." />
             )}
           </CardContent>
         </Card>
@@ -381,22 +471,22 @@ export default function Weather() {
                 );
               })
             ) : (
-              <Typography>Loading forecast...</Typography>
+              <LoadingCard message="Loading Forecast..." />
             )}
           </CardContent>
         </Card>
       </Box>
 
-      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", width: "98%" }}>
-        <Card>
+      <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", width: "98%", mb: 2 }}>
+        <Card sx={{ flex: 1, minWidth: "300px", boxShadow: 1 }}>
           <CardContent>
-            <h1>AQI</h1>
+            <WeatherAqiGauge usEpaIndex={currentWeather?.current?.air_quality?.["us-epa-index"]} />
           </CardContent>
         </Card>
 
-        <Card>
+        <Card sx={{ flex: 1, minWidth: "300px", boxShadow: 1 }}>
           <CardContent>
-            <h1>Wind</h1>
+            <WeatherCompassChart windDir={currentWeather?.current?.wind_dir} />
           </CardContent>
         </Card>
       </Box>
