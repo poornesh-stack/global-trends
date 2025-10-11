@@ -8,7 +8,6 @@ import {
   AppBar,
   Box,
   Button,
-  Divider,
   Drawer,
   List,
   ListItem,
@@ -62,7 +61,7 @@ export default function PermanentDrawer() {
           <div style={{ marginLeft: "auto" }}>
             <Button color="inherit">About</Button>
             <Button color="inherit">Contact</Button>
-            <Button color="inherit">Login</Button>
+            {/* <Button color="inherit">Login</Button> */}
           </div>
         </Toolbar>
       </AppBar>
@@ -92,7 +91,6 @@ export default function PermanentDrawer() {
             overflow: "visible",
           }}
         ></Box>
-        {/* <Divider sx={{ backgroundColor: "#ffffff" }} /> */}
         <List>
           {menuItem.map(({ text, icon, path }) => (
             <ListItem key={text} disablePadding>
