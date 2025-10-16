@@ -94,10 +94,14 @@ function SimpleDialog({ onClose, open, data }) {
                       <Box key={symbol || idx}>
                         <ListItem disableGutters sx={{ py: 0.5 }}>
                           <ListItemText
-                            primaryTypographyProps={{
-                              fontFamily: "Poppins, Inter, Roboto, sans-serif",
-                              letterSpacing: 0.3,
-                              fontSize: 14,
+                            slotProps={{
+                              primary: {
+                                sx: {
+                                  fontFamily: "Poppins, Inter, Roboto, sans-serif",
+                                  letterSpacing: 0.3,
+                                  fontSize: 14,
+                                },
+                              },
                             }}
                             primary={`${symbol} - ${name}`}
                           />

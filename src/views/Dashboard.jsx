@@ -1,32 +1,10 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
-import Currency from "./Currency";
+import { Box, Card, CardContent, Divider, Stack, Typography } from "@mui/material";
+import CryptoChartDashboard from "../components/CryptoChartDashboard";
+import WeatherDashboard from "../components/WeatherDashboard";
+import CurrencyDashboard from "../components/CurrencyDashboard";
 
 const drawerWidth = 240;
-const appbarWidth = 70;
-
-function CardComponent({ title, content }) {
-  return (
-    <Card sx={{ maxWidth: `calc(50% - 8px)`, ml: 2, mt: 1, maxHeight: 500 }}>
-      <CardContent>
-        <Typography
-          variant="h5"
-          component="div"
-          sx={{
-            fontFamily: "sans-serif",
-            fontWeight: 500,
-            letterSpacing: ".1rem",
-            color: "inherit",
-            textDecoration: "none",
-            mb: 2,
-          }}
-        >
-          {title}
-        </Typography>
-        {content}
-      </CardContent>
-    </Card>
-  );
-}
+const appbarWidth = 85;
 
 export default function Dashboard() {
   return (
@@ -36,15 +14,56 @@ export default function Dashboard() {
         ml: `${drawerWidth}px`,
         mt: `${appbarWidth}px`,
         display: "flex",
+        flexDirection: "column",
         gap: 2,
-        flexWrap: "wrap",
+        alignItems: "center",
+        pb: 3,
       }}
     >
-      <CardComponent title="Crypto Trends" />
+      <Stack direction="row" gap={2} sx={{ width: "98%" }}>
+        <Card
+          sx={{
+            width: "50%",
+            borderRadius: 3,
+            boxShadow: 1,
+          }}
+        >
+          <CardContent>
+            <Typography variant="h5" sx={{ opacity: 0.75, mb: 1 }}>
+              Cypto Currency Trends
+            </Typography>
+            <Divider sx={{ mb: 4 }} />
+            <CryptoChartDashboard />
+          </CardContent>
+        </Card>
 
-      <Currency />
+        <Card
+          sx={{
+            width: "50%",
+            borderRadius: 3,
+            boxShadow: 1,
+          }}
+        >
+          <CardContent>
+            <Typography variant="h5" sx={{ opacity: 0.75, mb: 1 }}>
+              USD vs INR (select ranges in chart)
+            </Typography>
+            <CurrencyDashboard currency1="usd" currency2="inr" />
+          </CardContent>
+        </Card>
+      </Stack>
 
-      <CardComponent title="Weather Trends" />
+      <Card
+        sx={{
+          width: "98%",
+          borderRadius: 3,
+          boxShadow: 1,
+        }}
+      >
+        <CardContent>
+          <WeatherDashboard />
+        </CardContent>
+      </Card>
     </Box>
   );
 }

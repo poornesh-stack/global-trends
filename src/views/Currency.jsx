@@ -254,12 +254,13 @@ export default function Currency() {
             variant="h5"
             component="div"
             sx={{
-              fontFamily: "sans-serif",
+              fontFamily: '"Italianno", cursive',
               fontWeight: 500,
               letterSpacing: ".1rem",
               color: "inherit",
               textDecoration: "none",
               mb: 1,
+              fontSize: "3rem",
             }}
           >
             Currency Converter and Trends
@@ -286,22 +287,25 @@ export default function Currency() {
                       variant="subtitle1"
                       component="div"
                       sx={{
-                        fontFamily: `"Roboto Slab", serif`,
-                        fontWeight: 700,
-                        fontSize: "1.1rem",
-                        letterSpacing: ".08rem",
+                        fontFamily: `"Shadows Into Light"`,
+                        fontWeight: 400,
+                        fontSize: "2.6rem",
                         color: "text.primary",
-                        mb: 3,
-                        mt: 2,
+                        mb: 1,
+                        textAlign: "center",
+                        lineHeight: 1.7,
+                        letterSpacing: ".05rem",
                       }}
                     >
                       {formatNumber(amount1)} {currency1Name} equals{" "}
                       <Box
                         component="div"
                         sx={{
-                          fontWeight: "bold",
-                          fontSize: "1.7rem",
-                          color: "secondary.primary",
+                          fontFamily: `"Shadows Into Light"`,
+                          fontWeight: 400,
+                          fontSize: "2.6rem",
+                          color: "secondary.main",
+                          letterSpacing: ".04rem",
                         }}
                       >
                         {formatNumber(amount2)} {currency2Name}

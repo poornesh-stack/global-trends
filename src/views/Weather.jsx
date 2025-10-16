@@ -57,7 +57,7 @@ export default function Weather() {
   function getWeatherData(query = "bangalore") {
     axios
       .get(
-        `http://api.weatherapi.com/v1/forecast.json?key=3c788fcae868481b8f065541252909&q=${query}&days=7&aqi=yes&alerts=yes`
+        `http://api.weatherapi.com/v1/forecast.json?key=2960e70f84bc49e9a5c10515251410&q=${query}&days=7&aqi=yes&alerts=yes`
       )
       .then((res) => {
         console.log(res.data, "Weather Data");
@@ -82,7 +82,7 @@ export default function Weather() {
     debounceRef.current = setTimeout(() => {
       axios
         .get(
-          `http://api.weatherapi.com/v1/search.json?key=3c788fcae868481b8f065541252909&q=${query}`
+          `http://api.weatherapi.com/v1/search.json?key=2960e70f84bc49e9a5c10515251410&q=${query}`
         )
         .then((res) => setSuggestions(res.data))
         .catch(() => setSuggestions([]));
@@ -130,11 +130,13 @@ export default function Weather() {
               variant="h5"
               component="div"
               sx={{
-                fontFamily: "sans-serif",
+                fontFamily: '"Italianno", cursive',
                 fontWeight: 500,
                 letterSpacing: ".1rem",
                 color: "inherit",
                 textDecoration: "none",
+                mb: 1,
+                fontSize: "3rem",
               }}
             >
               Weather Forecast
@@ -156,6 +158,21 @@ export default function Weather() {
                 (opt?.id ?? `${opt?.name}-${opt?.region}-${opt?.country}`) ===
                 (val?.id ?? `${val?.name}-${val?.region}-${val?.country}`)
               }
+              renderOption={(props, option) => (
+                <li {...props}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, py: 0.5 }}>
+                    <SearchOutlined fontSize="small" sx={{ opacity: 0.6 }} />
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.1 }}>
+                        {option?.name ?? option}
+                      </Typography>
+                      <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                        {[option?.region, option?.country].filter(Boolean).join(", ")}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </li>
+              )}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -183,6 +200,43 @@ export default function Weather() {
                 width: "90%",
                 [theme.breakpoints.up("sm")]: { width: "50%" },
                 [theme.breakpoints.up("md")]: { width: "30%" },
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2.5,
+                  bgcolor: "background.paper",
+                  transition: "box-shadow 200ms, transform 200ms",
+                  "&.Mui-focused": {
+                    transform: "translateY(-1px)",
+                  },
+                  "& .MuiInputAdornment-root": { color: "text.secondary" },
+                },
+              }}
+              slotProps={{
+                paper: {
+                  elevation: 0,
+                  sx: {
+                    mt: 1,
+                    borderRadius: 2,
+                    border: (th) => `1px solid ${th.palette.divider}`,
+                    overflow: "hidden",
+                  },
+                },
+                listbox: {
+                  sx: {
+                    py: 0.5,
+                    "& .MuiAutocomplete-option": {
+                      px: 1.25,
+                      "&[aria-selected='true']": {
+                        bgcolor: "action.selected",
+                      },
+                      "&.Mui-focused": {
+                        bgcolor: (th) => th.palette.action.hover,
+                      },
+                    },
+                  },
+                },
+                popper: {
+                  sx: { zIndex: (th) => th.zIndex.modal + 1 },
+                },
               }}
             />
           </Box>

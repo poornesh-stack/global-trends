@@ -65,7 +65,7 @@ export default function Crypto() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [cryptodata, setCryptoData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefresing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -86,7 +86,7 @@ export default function Crypto() {
 
   function getCryptoCurrency(isAutoRefresh = false) {
     if (isAutoRefresh) {
-      setIsRefresing(true);
+      setIsRefreshing(true);
     } else {
       setIsLoading(true);
     }
@@ -106,7 +106,7 @@ export default function Crypto() {
       })
       .finally(() => {
         if (isAutoRefresh) {
-          setIsRefresing(false);
+          setIsRefreshing(false);
         } else {
           setIsLoading(false);
         }
@@ -132,11 +132,13 @@ export default function Crypto() {
               variant="h5"
               component="div"
               sx={{
-                fontFamily: "sans-serif",
+                fontFamily: '"Italianno", cursive',
                 fontWeight: 500,
                 letterSpacing: ".1rem",
                 color: "inherit",
                 textDecoration: "none",
+                mb: 1,
+                fontSize: "3rem",
               }}
             >
               Crypto Currency
@@ -177,7 +179,22 @@ export default function Crypto() {
                             {columns.map((column) => {
                               const value = row[column.id];
                               return (
-                                <TableCell key={column.id} align={column.align}>
+                                <TableCell
+                                  key={column.id}
+                                  align={column.align}
+                                  sx={
+                                    column.id === "percent_change_24h"
+                                      ? {
+                                          color:
+                                            parseFloat(value) > 0
+                                              ? "green"
+                                              : parseFloat(value) < 0
+                                              ? "red"
+                                              : "black",
+                                        }
+                                      : {}
+                                  }
+                                >
                                   {column.format && value !== undefined
                                     ? column.format(value)
                                     : value}

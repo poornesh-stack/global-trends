@@ -153,33 +153,66 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
           if (newRange) setTimeRange(newRange);
         }}
         size="small"
-        sx={{
-          mb: 2,
-          backgroundColor: "transparent",
+        sx={(theme) => ({
           display: "flex",
           justifyContent: "center",
+          gap: 1,
           mb: 2,
-          gap: 2,
+          p: 0.5,
+          borderRadius: 999,
+          backdropFilter: "blur(8px)",
+          backgroundColor:
+            theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 6px 18px rgba(0,0,0,0.3)"
+              : "0 6px 18px rgba(0,0,0,0.08)",
           "& .MuiToggleButton-root": {
-            borderRadius: "5px",
-            border: "2px solid #ccc",
-            padding: "6px 12px",
-            color: "#333",
-            fontWeight: "500",
-            fontSize: "14px",
-            transition: "all 0.3s ease",
+            textTransform: "none",
+            minWidth: 56,
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 999,
+            border: `1px solid ${theme.palette.divider}`,
+            backgroundColor: "transparent",
+            color: theme.palette.text.primary,
+            fontWeight: 600,
+            fontSize: { xs: 12, sm: 13, md: 14 },
+            letterSpacing: 0.2,
+            transition: "transform 180ms ease, box-shadow 180ms ease, background 200ms",
             "&:hover": {
-              backgroundColor: "#e0e0e0",
-              color: "#000",
+              transform: "translateY(-1px)",
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 8px 20px rgba(0,0,0,0.35)"
+                  : "0 8px 20px rgba(0,0,0,0.10)",
+              backgroundColor:
+                theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
             },
             "&.Mui-selected": {
-              backgroundColor: "#d6d6d6",
-              color: "#000",
-              fontWeight: "bold",
-              borderColor: "#bdbdbd",
+              color: theme.palette.getContrastText(theme.palette.primary.main),
+              borderColor: "transparent",
+              boxShadow:
+                theme.palette.mode === "dark"
+                  ? "0 10px 22px rgba(0,0,0,0.45)"
+                  : "0 10px 22px rgba(0,0,0,0.12)",
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+              "&:hover": {
+                transform: "translateY(-2px)",
+                filter: "brightness(1.02)",
+              },
+            },
+            "&.Mui-focusVisible": {
+              outline: "none",
+              boxShadow: `0 0 0 3px ${theme.palette.primary.main}40`,
             },
           },
-        }}
+          "& .MuiToggleButtonGroup-grouped": {
+            border: "none",
+            "&:not(:first-of-type)": { border: "none" },
+            "&:first-of-type": { border: "none" },
+          },
+        })}
       >
         <ToggleButton value="1D">1D</ToggleButton>
         <ToggleButton value="5D">5D</ToggleButton>
