@@ -254,19 +254,18 @@ export default function Currency() {
             variant="h5"
             component="div"
             sx={{
-              fontFamily: '"Italianno", cursive',
-              fontWeight: 500,
+              fontFamily: '"Michroma", sans-serif',
+              fontWeight: 400,
               letterSpacing: ".1rem",
               color: "inherit",
               textDecoration: "none",
-              mb: 1,
-              fontSize: "3rem",
+              fontSize: "1.5rem",
             }}
           >
             Currency Converter and Trends
           </Typography>
 
-          <Divider sx={{ color: "#333333", mb: 2 }} />
+          <Divider sx={{ color: "#333333", mt: 3 }} />
         </CardContent>
       </Card>
 

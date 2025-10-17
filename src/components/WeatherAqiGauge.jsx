@@ -1,13 +1,59 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useMemo } from "react";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import * as am5radar from "@amcharts/amcharts5/radar";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import { Box, Typography } from "@mui/material";
+import { Box, Paper, Typography, Chip } from "@mui/material";
 import LoadingCard from "../utils/LoadingCard";
 
 export default function WeatherAqiGauge({ usEpaIndex }) {
   const chartRef = useRef(null);
+
+  const aqiInfo = useMemo(() => {
+    const idx = Number(usEpaIndex) || 0;
+    const map = {
+      1: {
+        title: "Good",
+        color: "#00e400",
+        message: "Air quality is satisfactory, and air pollution poses little or no risk.",
+      },
+      2: {
+        title: "Moderate",
+        color: "#f3eb0c",
+        message:
+          "Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.",
+      },
+      3: {
+        title: "Unhealthy for Sensitive Groups",
+        color: "#ff7e00",
+        message:
+          "Members of sensitive groups may experience health effects. The general public is less likely to be affected.",
+      },
+      4: {
+        title: "Unhealthy",
+        color: "#ff0000",
+        message:
+          "Some members of the general public may experience health effects; members of sensitive groups may experience more serious health effects.",
+      },
+      5: {
+        title: "Very Unhealthy",
+        color: "#8f3f97",
+        message: "Health alert: The risk of health effects is increased for everyone.",
+      },
+      6: {
+        title: "Hazardous",
+        color: "#7e0023",
+        message: "Health warning of emergency conditions: everyone is more likely to be affected.",
+      },
+    };
+    return (
+      map[idx] ?? {
+        title: "Unknown",
+        color: "#9e9e9e",
+        message: "Air quality data is unavailable.",
+      }
+    );
+  }, [usEpaIndex]);
 
   useLayoutEffect(() => {
     if (!chartRef.current) return;
@@ -77,7 +123,6 @@ export default function WeatherAqiGauge({ usEpaIndex }) {
 
     if (usEpaIndex) {
       axisDataItem.set("value", usEpaIndex);
-
       axisDataItem.animate({
         key: "value",
         to: usEpaIndex,
@@ -144,7 +189,7 @@ export default function WeatherAqiGauge({ usEpaIndex }) {
     return () => {
       root.dispose();
     };
-  }, [usEpaIndex]);
+  }, [usEpaIndex, aqiInfo.title]);
 
   return (
     <Box>
@@ -155,7 +200,57 @@ export default function WeatherAqiGauge({ usEpaIndex }) {
       {!usEpaIndex ? (
         <LoadingCard message="Loading Air Quality Index..." />
       ) : (
-        <Box ref={chartRef} style={{ width: "100%", height: "400px", display: "flex" }}></Box>
+        <>
+          <Box
+            ref={chartRef}
+            sx={{ width: "100%", height: 400, display: "flex", flex: 1, minWidth: 260 }}
+          />
+
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <Paper
+              elevation={1}
+              sx={{
+                minWidth: 280,
+                px: 1.75,
+                py: 1.25,
+                display: "grid",
+                gap: 0.25,
+                borderRadius: 2,
+                border: (t) => `1px solid ${t.palette.divider}`,
+              }}
+            >
+              <Typography variant="overline" sx={{ opacity: 0.8 }}>
+                Air Quality
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  flexWrap: "wrap",
+                }}
+              >
+                <Chip
+                  size="small"
+                  label={aqiInfo.title}
+                  sx={{
+                    fontWeight: 700,
+                    color: "#001133",
+                    bgcolor: aqiInfo.color,
+                  }}
+                />
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  AQI Index: <b>{usEpaIndex}</b>
+                </Typography>
+              </Box>
+
+              <Typography variant="body2" sx={{ mt: 0.5 }}>
+                {aqiInfo.message}
+              </Typography>
+            </Paper>
+          </Box>
+        </>
       )}
     </Box>
   );

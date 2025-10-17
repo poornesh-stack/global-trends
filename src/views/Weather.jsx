@@ -18,6 +18,7 @@ import Swal from "sweetalert2";
 import WeatherAqiGauge from "../components/WeatherAqiGauge";
 import LoadingCard from "../utils/LoadingCard";
 import WeatherCompassChart from "../components/WeatherCompassChart";
+import useGeotag from "../hooks/useGeotag";
 
 const drawerWidth = 240;
 const appbarWidth = 70;
@@ -43,6 +44,7 @@ function stripDecimalsFromObject(obj) {
 
 export default function Weather() {
   const theme = useTheme();
+  const geo = useGeotag();
   const [currentWeather, setCurrentWeather] = useState([]);
   const [forecastWeather, setForecastWeather] = useState(null);
   const [searchInput, setSearchInput] = useState("");
@@ -53,6 +55,14 @@ export default function Weather() {
   useEffect(() => {
     getWeatherData("bangalore");
   }, []);
+
+  useEffect(() => {
+    if (geo.ready && geo.lat != null && geo.lon != null) {
+      getWeatherData(`${geo.lat},${geo.lon}`);
+    } else if (geo.ready && geo.permission === "denied") {
+      getWeatherData("Los Angeles");
+    }
+  }, [geo.ready, geo.lat, geo.lon, geo.permission]);
 
   function getWeatherData(query = "bangalore") {
     axios
@@ -130,13 +140,12 @@ export default function Weather() {
               variant="h5"
               component="div"
               sx={{
-                fontFamily: '"Italianno", cursive',
-                fontWeight: 500,
+                fontFamily: '"Michroma", sans-serif',
+                fontWeight: 400,
                 letterSpacing: ".1rem",
                 color: "inherit",
                 textDecoration: "none",
-                mb: 1,
-                fontSize: "3rem",
+                fontSize: "1.5rem",
               }}
             >
               Weather Forecast
@@ -186,13 +195,15 @@ export default function Weather() {
                       if (q) getWeatherData(q);
                     }
                   }}
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchOutlined />
-                      </InputAdornment>
-                    ),
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchOutlined />
+                        </InputAdornment>
+                      ),
+                    },
                   }}
                 />
               )}
@@ -241,7 +252,7 @@ export default function Weather() {
             />
           </Box>
 
-          <Divider sx={{ color: "#333333", mt: 2 }} />
+          <Divider sx={{ color: "#333333", mt: 3 }} />
         </CardContent>
       </Card>
 
