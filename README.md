@@ -1,3 +1,5 @@
+<img width="1919" height="854" alt="Screenshot 2025-10-30 192914" src="https://github.com/user-attachments/assets/8770a514-8e57-40d0-83a4-21d473de5fb1" />
+
 Hi! I’m Poornesh Suresh, this project combines live weather updates, real-time cryptocurrency data, and global currency trends into one sleek, interactive dashboard.
 
 Why I Built This,
