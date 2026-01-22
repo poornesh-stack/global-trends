@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -21,14 +22,17 @@ import {
   PersonOutline,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import useSignup from "../hooks/useSignup";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { signup, isLoading, error } = useSignup();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -62,6 +66,13 @@ export default function Signup() {
       newErrors.lastName = "Last name is required";
     }
 
+    if (
+      formData.username &&
+      (formData.username.length < 3 || formData.username.length > 20)
+    ) {
+      newErrors.username = "Username must be between 3 and 20 characters";
+    }
+
     if (!formData.email) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
@@ -70,11 +81,13 @@ export default function Signup() {
 
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+    } else if (formData.password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    } else if (
+      !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/.test(formData.password)
+    ) {
       newErrors.password =
-        "Password must contain uppercase, lowercase, and number";
+        "Password must contain uppercase, lowercase, number, and special character";
     }
 
     if (!formData.confirmPassword) {
@@ -91,13 +104,26 @@ export default function Signup() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Handle signup logic here
-      console.log("Signup submitted:", formData);
-      // Navigate to dashboard or login after successful signup
-      navigate("/");
+      // Prepare data for backend - only send what backend expects
+      const signupData = {
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      };
+
+      // Only add username if it's provided
+      if (formData.username.trim()) {
+        signupData.username = formData.username;
+      }
+
+      const success = await signup(signupData);
+      if (success) {
+        navigate("/");
+      }
     }
   };
 
@@ -160,6 +186,12 @@ export default function Signup() {
 
         <CardContent sx={{ p: 4 }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Box sx={{ display: "flex", gap: 2, mb: 2.5 }}>
               <TextField
                 fullWidth
@@ -171,6 +203,7 @@ export default function Signup() {
                 helperText={errors.firstName}
                 autoComplete="given-name"
                 autoFocus
+                disabled={isLoading}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -189,6 +222,7 @@ export default function Signup() {
                 error={!!errors.lastName}
                 helperText={errors.lastName}
                 autoComplete="family-name"
+                disabled={isLoading}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -201,6 +235,26 @@ export default function Signup() {
 
             <TextField
               fullWidth
+              label="Username (Optional)"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              error={!!errors.username}
+              helperText={errors.username || "3-20 characters"}
+              autoComplete="username"
+              disabled={isLoading}
+              sx={{ mb: 2.5 }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonOutline sx={{ color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              fullWidth
               label="Email Address"
               name="email"
               type="email"
@@ -209,6 +263,7 @@ export default function Signup() {
               error={!!errors.email}
               helperText={errors.email}
               autoComplete="email"
+              disabled={isLoading}
               sx={{ mb: 2.5 }}
               InputProps={{
                 startAdornment: (
@@ -229,6 +284,7 @@ export default function Signup() {
               error={!!errors.password}
               helperText={errors.password}
               autoComplete="new-password"
+              disabled={isLoading}
               sx={{ mb: 2.5 }}
               InputProps={{
                 startAdornment: (
@@ -241,6 +297,7 @@ export default function Signup() {
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
+                      disabled={isLoading}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -259,6 +316,7 @@ export default function Signup() {
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
               autoComplete="new-password"
+              disabled={isLoading}
               sx={{ mb: 2 }}
               InputProps={{
                 startAdornment: (
@@ -273,6 +331,7 @@ export default function Signup() {
                         setShowConfirmPassword(!showConfirmPassword)
                       }
                       edge="end"
+                      disabled={isLoading}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -287,6 +346,7 @@ export default function Signup() {
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
                   onChange={handleChange}
+                  disabled={isLoading}
                   sx={{
                     color: errors.agreeToTerms ? "error.main" : "inherit",
                   }}
@@ -320,6 +380,7 @@ export default function Signup() {
               fullWidth
               variant="contained"
               size="large"
+              disabled={isLoading}
               sx={{
                 py: 1.5,
                 background: "linear-gradient(135deg, #000068 0%, #2626a5 100%)",
@@ -333,9 +394,12 @@ export default function Signup() {
                     "linear-gradient(135deg, #2626a5 0%, #000068 100%)",
                   boxShadow: "0 8px 25px rgba(0,0,104,0.4)",
                 },
+                "&:disabled": {
+                  background: "rgba(0, 0, 104, 0.5)",
+                },
               }}
             >
-              Create Account
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <Divider sx={{ my: 3 }}>

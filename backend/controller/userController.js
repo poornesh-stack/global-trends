@@ -15,7 +15,7 @@ const loginUser = async (req, res) => {
     // Required field validation
     if (!identifier || !password) {
       return res.status(400).json({
-        error: "All fields are requried",
+        error: "All fields are required",
       });
     }
 
@@ -50,12 +50,13 @@ const loginUser = async (req, res) => {
     const token = createToken(user._id);
 
     // Send response with public profile
-    res.status(200).json({
+    return res.status(200).json({
       user: user.getPublicProfile(),
       token,
     });
   } catch (error) {
-    res.status(500).json({
+    console.error("Login error:", error);
+    return res.status(500).json({
       error: "Server error. Please try again later.",
     });
   }
@@ -63,11 +64,14 @@ const loginUser = async (req, res) => {
 
 // Signup user
 const signupUser = async (req, res) => {
+  console.log("Signup request received:", req.body);
+
   const { email, password, username, firstName, lastName, theme } = req.body;
 
   try {
     // Required field validation
     if (!email || !password) {
+      console.log("Missing email or password");
       return res.status(400).json({
         error: "Email and Password are required",
       });
@@ -75,6 +79,7 @@ const signupUser = async (req, res) => {
 
     // Email format validation
     if (!validator.isEmail(email)) {
+      console.log("Invalid email format");
       return res.status(400).json({
         error: "Invalid email format",
       });
@@ -90,6 +95,7 @@ const signupUser = async (req, res) => {
         minSymbols: 1,
       })
     ) {
+      console.log("Password not strong enough");
       return res.status(400).json({
         error:
           "Password must be at least 8 characters and include uppercase, lowercase, number, and special character",
@@ -99,6 +105,7 @@ const signupUser = async (req, res) => {
     // Username validation (if provided)
     if (username) {
       if (username.length < 3 || username.length > 20) {
+        console.log("Invalid username length");
         return res.status(400).json({
           error: "Username must be between 3 and 20 characters",
         });
@@ -107,6 +114,7 @@ const signupUser = async (req, res) => {
       // Check if username already exists
       const usernameExists = await User.findOne({ username });
       if (usernameExists) {
+        console.log("Username already exists");
         return res.status(400).json({
           error: "Username already taken",
         });
@@ -116,6 +124,7 @@ const signupUser = async (req, res) => {
     // Check if email already exists
     const emailExists = await User.findOne({ email: email.toLowerCase() });
     if (emailExists) {
+      console.log("Email already exists");
       return res.status(400).json({
         error: "Email already in use",
       });
@@ -135,18 +144,26 @@ const signupUser = async (req, res) => {
     if (firstName) userData.firstName = firstName;
     if (lastName) userData.lastName = lastName;
 
+    console.log("Creating user with data:", {
+      ...userData,
+      password: "[REDACTED]",
+    });
+
     // Create user
     const user = await User.create(userData);
+    console.log("User created successfully");
 
     // Generate JWT token
     const token = createToken(user._id);
 
     // Send response with public profile
-    res.status(201).json({
+    return res.status(201).json({
       user: user.getPublicProfile(),
       token,
     });
   } catch (error) {
+    console.error("Signup error:", error);
+
     // Handle duplicate key errors from MongoDB
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern)[0];
@@ -155,8 +172,8 @@ const signupUser = async (req, res) => {
       });
     }
 
-    res.status(400).json({
-      error: error.message,
+    return res.status(400).json({
+      error: error.message || "An error occurred during signup",
     });
   }
 };

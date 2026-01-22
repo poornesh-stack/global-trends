@@ -155,9 +155,11 @@ export default function Currency() {
   ];
 
   const currency1Name =
-    currencies.find((c) => c.code === currency1)?.name || currency1.toUpperCase();
+    currencies.find((c) => c.code === currency1)?.name ||
+    currency1.toUpperCase();
   const currency2Name =
-    currencies.find((c) => c.code === currency2)?.name || currency2.toUpperCase();
+    currencies.find((c) => c.code === currency2)?.name ||
+    currency2.toUpperCase();
 
   const formatNumber = (value) => {
     if (isNaN(value) || value === "") return "";
@@ -175,7 +177,7 @@ export default function Currency() {
     loadGetCurrencyRate();
 
     const interval = setInterval(() => {
-      loadGetCurrencyName();
+      loadGetCurrencyRate();
     }, 60000);
 
     return () => clearInterval(interval);
@@ -200,7 +202,9 @@ export default function Currency() {
   function loadGetCurrencyName() {
     setLoading((prev) => ({ ...prev, names: true }));
     axios
-      .get(`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json`)
+      .get(
+        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies.json`,
+      )
       .then((res) => {
         console.log(res.data, "Currency Name");
         const currencyList = Object.entries(res.data).map(([code, name]) => ({
@@ -211,8 +215,14 @@ export default function Currency() {
         setLoading((prev) => ({ ...prev, names: false }));
       })
       .catch((err) => {
+        console.error("Error fetching currency names:", err);
         setLoading((prev) => ({ ...prev, names: false }));
-        Swal.fire("Error fetching Currency Names.", "", "error");
+        // Fallback: use hardcoded currency names
+        const fallbackCurrencies = allowedCurrencies.map((code) => ({
+          code,
+          name: code.toUpperCase(),
+        }));
+        setCurrencies(fallbackCurrencies);
       });
   }
 
@@ -220,7 +230,7 @@ export default function Currency() {
     setLoading((prev) => ({ ...prev, rates: true }));
     axios
       .get(
-        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency1}.json`
+        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/${currency1}.json`,
       )
       .then((res) => {
         console.log(res.data, "Currency Rates");
@@ -228,12 +238,18 @@ export default function Currency() {
         setLoading((prev) => ({ ...prev, rates: false }));
       })
       .catch((err) => {
+        console.error("Error fetching currency rates:", err);
         setLoading((prev) => ({ ...prev, rates: false }));
-        Swal.fire("Error fetching Currency Rates.", "", "error");
+        Swal.fire({
+          title: "Error fetching Currency Rates",
+          text: "The currency API is temporarily unavailable. Please try again later.",
+          icon: "error",
+        });
       });
   }
 
-  const showInitialLoader = !hasLoadedOnce.current && (loading.names || loading.rates);
+  const showInitialLoader =
+    !hasLoadedOnce.current && (loading.names || loading.rates);
 
   return (
     <Box
@@ -313,7 +329,12 @@ export default function Currency() {
                   </Box>
 
                   <Box
-                    sx={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "center" }}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      alignItems: "center",
+                    }}
                   >
                     <Box
                       sx={{
@@ -341,7 +362,11 @@ export default function Currency() {
                           }}
                         />
                       </Box>
-                      <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
+                      <Divider
+                        orientation="vertical"
+                        flexItem
+                        sx={{ color: "black", my: 0.5 }}
+                      />
                       <Select
                         value={currency1}
                         onChange={(e) => setCurrency1(e.target.value)}
@@ -350,7 +375,9 @@ export default function Currency() {
                           color: "inherit",
                           ml: 1,
                           "& .MuiSelect-icon": { color: "#aaa" },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            border: "none",
+                          },
                           backgroundColor: "transparent",
                           textAlign: "right",
                         }}
@@ -393,7 +420,11 @@ export default function Currency() {
                           }}
                         />
                       </Box>
-                      <Divider orientation="vertical" flexItem sx={{ color: "black", my: 0.5 }} />
+                      <Divider
+                        orientation="vertical"
+                        flexItem
+                        sx={{ color: "black", my: 0.5 }}
+                      />
                       <Select
                         value={currency2}
                         onChange={(e) => setCurrency2(e.target.value)}
@@ -402,7 +433,9 @@ export default function Currency() {
                           color: "inherit",
                           ml: 1,
                           "& .MuiSelect-icon": { color: "#aaa" },
-                          "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            border: "none",
+                          },
                           backgroundColor: "transparent",
                           textAlign: "right",
                         }}
@@ -427,7 +460,10 @@ export default function Currency() {
                     display: "flex",
                   }}
                 >
-                  <CurrencyLineGraph currency1={currency1} currency2={currency2} />
+                  <CurrencyLineGraph
+                    currency1={currency1}
+                    currency2={currency2}
+                  />
                 </Box>
               </Box>
             </CardContent>

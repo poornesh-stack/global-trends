@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   Card,
@@ -18,12 +19,14 @@ import {
   LockOutlined,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import useLogin from "../hooks/useLogin";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login, isLoading, error } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
@@ -46,10 +49,8 @@ export default function Login() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
+    if (!formData.identifier) {
+      newErrors.identifier = "Email or username is required";
     }
 
     if (!formData.password) {
@@ -62,13 +63,13 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Handle login logic here
-      console.log("Login submitted:", formData);
-      // Navigate to dashboard after successful login
-      navigate("/");
+      const success = await login(formData.identifier, formData.password);
+      if (success) {
+        navigate("/");
+      }
     }
   };
 
@@ -130,17 +131,23 @@ export default function Login() {
 
         <CardContent sx={{ p: 4 }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <TextField
               fullWidth
-              label="Email Address"
-              name="email"
-              type="email"
-              value={formData.email}
+              label="Email or Username"
+              name="identifier"
+              value={formData.identifier}
               onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-              autoComplete="email"
+              error={!!errors.identifier}
+              helperText={errors.identifier}
+              autoComplete="username"
               autoFocus
+              disabled={isLoading}
               sx={{ mb: 2.5 }}
               InputProps={{
                 startAdornment: (
@@ -161,6 +168,7 @@ export default function Login() {
               error={!!errors.password}
               helperText={errors.password}
               autoComplete="current-password"
+              disabled={isLoading}
               sx={{ mb: 1 }}
               InputProps={{
                 startAdornment: (
@@ -173,6 +181,7 @@ export default function Login() {
                     <IconButton
                       onClick={() => setShowPassword(!showPassword)}
                       edge="end"
+                      disabled={isLoading}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -200,6 +209,7 @@ export default function Login() {
               fullWidth
               variant="contained"
               size="large"
+              disabled={isLoading}
               sx={{
                 py: 1.5,
                 background: "linear-gradient(135deg, #000068 0%, #2626a5 100%)",
@@ -213,9 +223,12 @@ export default function Login() {
                     "linear-gradient(135deg, #2626a5 0%, #000068 100%)",
                   boxShadow: "0 8px 25px rgba(0,0,104,0.4)",
                 },
+                "&:disabled": {
+                  background: "rgba(0, 0, 104, 0.5)",
+                },
               }}
             >
-              Sign In
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
 
             <Divider sx={{ my: 3 }}>

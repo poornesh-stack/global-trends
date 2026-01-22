@@ -4,6 +4,7 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { Box, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function CurrencyLineGraph({ currency1, currency2 }) {
   const chartRef = useRef(null);
@@ -23,14 +24,14 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         wheelY: "zoomX",
         pinchZoomX: true,
         paddingLeft: 0,
-      })
+      }),
     );
 
     const cursor = chart.set(
       "cursor",
       am5xy.XYCursor.new(root, {
         behavior: "none",
-      })
+      }),
     );
     cursor.lineY.set("visible", false);
 
@@ -40,7 +41,7 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         baseInterval: { timeUnit: "day", count: 1 },
         renderer: am5xy.AxisRendererX.new(root, { minorGridEnabled: true }),
         tooltip: am5.Tooltip.new(root, {}),
-      })
+      }),
     );
 
     const yAxis = chart.yAxes.push(
@@ -48,7 +49,7 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         renderer: am5xy.AxisRendererY.new(root, {
           pan: "zoom",
         }),
-      })
+      }),
     );
 
     const series = chart.series.push(
@@ -61,14 +62,14 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         tooltip: am5.Tooltip.new(root, {
           labelText: "{valueY}",
         }),
-      })
+      }),
     );
 
     chart.set(
       "scrollbarX",
       am5.Scrollbar.new(root, {
         orientation: "horizontal",
-      })
+      }),
     );
 
     function getDaysForRange(range) {
@@ -86,7 +87,7 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
       }
     }
 
-    function historicalData(currency1, currency2, range) {
+    async function historicalData(currency1, currency2, range) {
       const today = new Date();
       const request = [];
       const days = getDaysForRange(range);
@@ -105,7 +106,7 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         request.push(
           axios
             .get(
-              `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateStr}/v1/currencies/${currency1}.json`
+              `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateStr}/v1/currencies/${currency1}.json`,
             )
             .then((res) => {
               const rate = res.data[currency1]?.[currency2];
@@ -114,17 +115,40 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
               }
               return null;
             })
+            .catch((err) => {
+              console.error(
+                `Failed to fetch rate for ${dateStr}:`,
+                err.message,
+              );
+              return null;
+            }),
         );
       }
 
-      Promise.all(request)
-        .then((results) => {
-          const dataPoints = results.filter((item) => item !== null);
+      try {
+        const results = await Promise.all(request);
+        const dataPoints = results.filter((item) => item !== null);
+
+        if (dataPoints.length === 0) {
+          console.error(
+            "No currency data available for the selected time range",
+          );
+          Swal.fire({
+            title: "No Data Available",
+            text: "Unable to load currency data for the selected time range. The API may be temporarily unavailable.",
+            icon: "warning",
+          });
+        } else {
           series.data.setAll(dataPoints);
-        })
-        .catch((err) => {
-          Swal.fire("Error fetching Currency Rates.", "", "error");
+        }
+      } catch (err) {
+        console.error("Error fetching currency rates:", err);
+        Swal.fire({
+          title: "Error",
+          text: "Unable to fetch currency rates. Please try again later.",
+          icon: "error",
         });
+      }
     }
 
     historicalData(currency1, currency2, timeRange);
@@ -162,7 +186,9 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
           borderRadius: 999,
           backdropFilter: "blur(8px)",
           backgroundColor:
-            theme.palette.mode === "dark" ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+            theme.palette.mode === "dark"
+              ? "rgba(255,255,255,0.04)"
+              : "rgba(0,0,0,0.04)",
           boxShadow:
             theme.palette.mode === "dark"
               ? "0 6px 18px rgba(0,0,0,0.3)"
@@ -179,7 +205,8 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
             fontWeight: 600,
             fontSize: { xs: 12, sm: 13, md: 14 },
             letterSpacing: 0.2,
-            transition: "transform 180ms ease, box-shadow 180ms ease, background 200ms",
+            transition:
+              "transform 180ms ease, box-shadow 180ms ease, background 200ms",
             "&:hover": {
               transform: "translateY(-1px)",
               boxShadow:
@@ -187,7 +214,9 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
                   ? "0 8px 20px rgba(0,0,0,0.35)"
                   : "0 8px 20px rgba(0,0,0,0.10)",
               backgroundColor:
-                theme.palette.mode === "dark" ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.06)"
+                  : "rgba(0,0,0,0.06)",
             },
             "&.Mui-selected": {
               color: theme.palette.getContrastText(theme.palette.primary.main),
@@ -220,7 +249,10 @@ export default function CurrencyLineGraph({ currency1, currency2 }) {
         <ToggleButton value="1Y">1Y</ToggleButton>
       </ToggleButtonGroup>
 
-      <Box ref={chartRef} sx={{ width: "100%", height: "400px", display: "flex" }}></Box>
+      <Box
+        ref={chartRef}
+        sx={{ width: "100%", height: "400px", display: "flex" }}
+      ></Box>
     </Box>
   );
 }

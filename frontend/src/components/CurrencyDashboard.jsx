@@ -23,14 +23,14 @@ export default function CurrencyDashboard({ currency1, currency2 }) {
         wheelY: "zoomX",
         pinchZoomX: true,
         paddingLeft: 0,
-      })
+      }),
     );
 
     const cursor = chart.set(
       "cursor",
       am5xy.XYCursor.new(root, {
         behavior: "none",
-      })
+      }),
     );
     cursor.lineY.set("visible", false);
 
@@ -40,13 +40,13 @@ export default function CurrencyDashboard({ currency1, currency2 }) {
         baseInterval: { timeUnit: "day", count: 1 },
         renderer: am5xy.AxisRendererX.new(root, { minorGridEnabled: true }),
         tooltip: am5.Tooltip.new(root, {}),
-      })
+      }),
     );
 
     const yAxis = chart.yAxes.push(
       am5xy.ValueAxis.new(root, {
         renderer: am5xy.AxisRendererY.new(root, { pan: "zoom" }),
-      })
+      }),
     );
 
     const series = chart.series.push(
@@ -57,14 +57,14 @@ export default function CurrencyDashboard({ currency1, currency2 }) {
         valueYField: "value",
         valueXField: "date",
         tooltip: am5.Tooltip.new(root, { labelText: "{valueY}" }),
-      })
+      }),
     );
 
     chart.set(
       "scrollbarX",
       am5.Scrollbar.new(root, {
         orientation: "horizontal",
-      })
+      }),
     );
 
     async function fetchOneYearWeekly(base, quote) {
@@ -85,21 +85,43 @@ export default function CurrencyDashboard({ currency1, currency2 }) {
         requests.push(
           axios
             .get(
-              `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateStr}/v1/currencies/${base}.json`
+              `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateStr}/v1/currencies/${base}.json`,
             )
             .then((res) => {
               const rate = res.data?.[base]?.[quote];
               return rate ? { date: d.getTime(), value: rate } : null;
             })
+            .catch((err) => {
+              console.error(
+                `Failed to fetch rate for ${dateStr}:`,
+                err.message,
+              );
+              return null;
+            }),
         );
       }
 
       try {
         const results = await Promise.all(requests);
         const points = results.filter(Boolean).sort((a, b) => a.date - b.date);
-        series.data.setAll(points);
+
+        if (points.length === 0) {
+          console.error("No currency data available");
+          Swal.fire({
+            title: "No Data Available",
+            text: "Unable to load historical currency data. The API may be temporarily unavailable.",
+            icon: "warning",
+          });
+        } else {
+          series.data.setAll(points);
+        }
       } catch (err) {
-        Swal.fire("Error fetching Currency Rates.", "", "error");
+        console.error("Error fetching currency rates:", err);
+        Swal.fire({
+          title: "Error",
+          text: "Unable to fetch currency rates. Please try again later.",
+          icon: "error",
+        });
       }
     }
 
@@ -122,7 +144,10 @@ export default function CurrencyDashboard({ currency1, currency2 }) {
         width: "91%",
       }}
     >
-      <Box ref={chartRef} sx={{ width: "100%", height: "400px", display: "flex" }} />
+      <Box
+        ref={chartRef}
+        sx={{ width: "100%", height: "400px", display: "flex" }}
+      />
     </Box>
   );
 }

@@ -3,9 +3,11 @@ import {
   CloudOutlined,
   CurrencyExchangeOutlined,
   DashboardOutlined,
+  LogoutOutlined,
 } from "@mui/icons-material";
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
   Chip,
@@ -21,6 +23,8 @@ import {
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContextProvider";
+import useLogout from "../hooks/useLogout";
 
 const drawerWidth = 240;
 
@@ -34,8 +38,43 @@ const menuItem = [
 export default function PermanentDrawer() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuthContext();
+  const { logout } = useLogout();
 
   const isActive = (path) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  // Get user initials for avatar
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    if (user?.username) {
+      return user.username[0].toUpperCase();
+    }
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+    return "U";
+  };
+
+  // Get display name
+  const getDisplayName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user?.username) {
+      return user.username;
+    }
+    if (user?.email) {
+      return user.email.split("@")[0];
+    }
+    return "User";
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -95,6 +134,73 @@ export default function PermanentDrawer() {
               }}
             >
               Contact
+            </Button>
+
+            {/* User Info Display */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                ml: 2,
+                px: 2,
+                py: 0.5,
+                borderRadius: 999,
+                backgroundColor: alpha("#ffffff", 0.1),
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+            >
+              <Avatar
+                sx={{
+                  width: 32,
+                  height: 32,
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  background:
+                    "linear-gradient(135deg, #72E7FF 0%, #7B61FF 100%)",
+                }}
+              >
+                {getUserInitials()}
+              </Avatar>
+              <Box
+                sx={{ display: "flex", flexDirection: "column", lineHeight: 1 }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{ fontWeight: 600, fontSize: "0.875rem" }}
+                >
+                  {getDisplayName()}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ opacity: 0.8, fontSize: "0.7rem" }}
+                >
+                  {user?.email}
+                </Typography>
+              </Box>
+            </Box>
+
+            {/* Logout Button */}
+            <Button
+              color="inherit"
+              onClick={handleLogout}
+              startIcon={<LogoutOutlined />}
+              sx={{
+                px: 2,
+                py: 0.75,
+                borderRadius: 999,
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "0.875rem",
+                backgroundColor: alpha("#ffffff", 0.1),
+                border: "1px solid rgba(255,255,255,0.2)",
+                "&:hover": {
+                  backgroundColor: alpha("#ffffff", 0.2),
+                  border: "1px solid rgba(255,255,255,0.3)",
+                },
+              }}
+            >
+              Logout
             </Button>
           </Box>
         </Toolbar>
@@ -219,18 +325,75 @@ export default function PermanentDrawer() {
 
         <Box sx={{ flexGrow: 1 }} />
 
-        <Box sx={{ px: 2, pb: 2, display: "grid", gap: 1 }}>
+        {/* User Profile Card in Sidebar */}
+        <Box
+          sx={{
+            mx: 2,
+            mb: 2,
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: alpha("#FFFFFF", 0.08),
+            border: "1px solid rgba(255,255,255,0.12)",
+          }}
+        >
+          <Box
+            sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}
+          >
+            <Avatar
+              sx={{
+                width: 40,
+                height: 40,
+                fontSize: "1rem",
+                fontWeight: 700,
+                background: "linear-gradient(135deg, #72E7FF 0%, #7B61FF 100%)",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              }}
+            >
+              {getUserInitials()}
+            </Avatar>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 600,
+                  fontSize: "0.875rem",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {getDisplayName()}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{
+                  opacity: 0.7,
+                  fontSize: "0.7rem",
+                  display: "block",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {user?.email}
+              </Typography>
+            </Box>
+          </Box>
           <Chip
             label="Live"
             size="small"
             sx={{
               width: "fit-content",
               fontWeight: 700,
+              fontSize: "0.7rem",
               color: "#001133",
               backgroundColor: "#72E7FF",
             }}
           />
-          <Typography variant="caption" sx={{ opacity: 0.7, lineHeight: 1.4 }}>
+          <Typography
+            variant="caption"
+            sx={{ opacity: 0.7, lineHeight: 1.4, display: "block", mt: 0.5 }}
+          >
             Data updates in real-time.
           </Typography>
         </Box>
