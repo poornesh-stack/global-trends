@@ -15,7 +15,6 @@ import {
   AttachMoneyOutlined,
   CurrencyExchangeOutlined,
   ConstructionOutlined,
-  AddCommentOutlined,
   RocketLaunchOutlined,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -40,7 +39,10 @@ function SectionCard({ icon, title, children }) {
           {title}
         </Typography>
       </Stack>
-      <Typography variant="body1" sx={{ color: "text.secondary", lineHeight: 1.7 }}>
+      <Typography
+        variant="body1"
+        sx={{ color: "text.secondary", lineHeight: 1.7 }}
+      >
         {children}
       </Typography>
     </Paper>
@@ -84,7 +86,11 @@ export default function About() {
             <Box>
               <Typography
                 variant="h4"
-                sx={{ fontWeight: 800, letterSpacing: ".02em", lineHeight: 1.2 }}
+                sx={{
+                  fontWeight: 800,
+                  letterSpacing: ".02em",
+                  lineHeight: 1.2,
+                }}
               >
                 About Global Trends
               </Typography>
@@ -96,9 +102,9 @@ export default function About() {
                   lineHeight: 1.75,
                 }}
               >
-                Hi! I’m Poornesh Suresh, this project combines live weather updates, real-time
-                cryptocurrency data, and global currency trends into one sleek, interactive
-                dashboard.
+                Hi! I’m Poornesh Suresh, this project combines live weather
+                updates, real-time cryptocurrency data, and global currency
+                trends into one sleek, interactive dashboard.
               </Typography>
             </Box>
           </Stack>
@@ -119,12 +125,14 @@ export default function About() {
             Why I Built This
           </Typography>
           <Typography sx={{ color: "text.secondary", lineHeight: 1.8 }}>
-            Beyond the basics, it offers detailed insights into currency movements, dynamic graphs
-            showcasing live crypto prices, and highlights of leading market performers. It’s
-            designed to help new investors make smarter decisions about where to invest their money.
-            In the near future, this platform will expand to include the latest global trends from
-            breaking news and financial updates to live sports scores and more. The goal is simple:
-            To make everyday data quick to access, visually engaging, and easy to understand In One
+            Beyond the basics, it offers detailed insights into currency
+            movements, dynamic graphs showcasing live crypto prices, and
+            highlights of leading market performers. It’s designed to help new
+            investors make smarter decisions about where to invest their money.
+            In the near future, this platform will expand to include the latest
+            global trends from breaking news and financial updates to live
+            sports scores and more. The goal is simple: To make everyday data
+            quick to access, visually engaging, and easy to understand In One
             Place.
           </Typography>
         </Paper>
@@ -148,21 +156,25 @@ export default function About() {
                 icon={<AttachMoneyOutlined sx={{ color: "primary.main" }} />}
                 title="Crypto Currency (Realtime)"
               >
-                Stay on top of the crypto market with live price tracking, top gainers and losers,
-                and interactive charts that update in real time. Whether you’re a casual observer or
-                an active trader, this feature gives you a clear, visual snapshot of the market
-                which is updated continuously for accuracy and insight.
+                Stay on top of the crypto market with live price tracking, top
+                gainers and losers, and interactive charts that update in real
+                time. Whether you’re a casual observer or an active trader, this
+                feature gives you a clear, visual snapshot of the market which
+                is updated continuously for accuracy and insight.
               </SectionCard>
             </Grid>
 
             <Grid item xs={12} md={4}>
               <SectionCard
-                icon={<CurrencyExchangeOutlined sx={{ color: "primary.main" }} />}
+                icon={
+                  <CurrencyExchangeOutlined sx={{ color: "primary.main" }} />
+                }
                 title="Currency Converter & Trends"
               >
-                Convert between major currencies and visualize historical exchange rates with an
-                intuitive, responsive interface. Clean inputs and time-range controls make it simple
-                to explore trends and compare values across time.
+                Convert between major currencies and visualize historical
+                exchange rates with an intuitive, responsive interface. Clean
+                inputs and time-range controls make it simple to explore trends
+                and compare values across time.
               </SectionCard>
             </Grid>
 
@@ -171,9 +183,9 @@ export default function About() {
                 icon={<CloudOutlined sx={{ color: "primary.main" }} />}
                 title="Weather Forecast & Air Quality"
               >
-                Get current weather conditions, a 7-day forecast, wind direction, and air quality
-                index. The built-in search supports quick lookups so just type and hit Enter for
-                instant results.
+                Get current weather conditions, a 7-day forecast, wind
+                direction, and air quality index. The built-in search supports
+                quick lookups so just type and hit Enter for instant results.
               </SectionCard>
             </Grid>
           </Grid>
@@ -200,7 +212,12 @@ export default function About() {
                     </Typography>
                   </Stack>
 
-                  <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ pt: 1 }}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
+                    sx={{ pt: 1 }}
+                  >
                     <Chip label="React JS" size="small" />
                     <Chip label="Material UI" size="small" />
                     <Chip label="amCharts 5" size="small" />
@@ -211,7 +228,11 @@ export default function About() {
                   </Stack>
                 </Stack>
 
-                <Stack direction="row" spacing={2} sx={{ mt: 1, flexWrap: "wrap" }}>
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{ mt: 1, flexWrap: "wrap" }}
+                >
                   <Button
                     startIcon={<RocketLaunchOutlined />}
                     variant="contained"
@@ -225,39 +246,6 @@ export default function About() {
             </Grid>
           </Grid>
         </Paper>
-
-        {/* <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 2, md: 3 },
-            borderRadius: 3,
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            mt: 2,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-            Any Suggestions?
-          </Typography>
-          <Typography sx={{ color: "text.secondary", lineHeight: 1.8 }}>
-            Got a cool feature in mind or spotted something to improve? Drop your thoughts, I’m
-            always open to fresh ideas!
-          </Typography>
-
-          <Button
-            startIcon={<AddCommentOutlined />}
-            variant="contained"
-            sx={{ boxShadow: "none", mt: 2 }}
-            onClick={() =>
-              window.open(
-                "https://github.com/poornesh-stack/global-trends",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-          >
-            Suggestions
-          </Button>
-        </Paper> */}
       </Box>
     </Box>
   );
