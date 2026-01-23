@@ -22,6 +22,7 @@ export default function useLogin() {
       if (!response.ok) {
         setIsLoading(false);
         setError(json.error || "Login failed");
+        return false;
       }
 
       // Save user and token separately to localStorage

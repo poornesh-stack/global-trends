@@ -30,7 +30,9 @@ const loginUser = async (req, res) => {
     //Check if user exists
     if (!user) {
       return res.status(401).json({
-        error: "Invalid credentials",
+        error: isEmail
+          ? "No account found with this email address"
+          : "No account found with this username",
       });
     }
 
@@ -38,7 +40,7 @@ const loginUser = async (req, res) => {
     const isPasswordMatch = await user.comparePassword(password);
     if (!isPasswordMatch) {
       return res.status(401).json({
-        error: "Invalid credentials",
+        error: "Incorrect password",
       });
     }
 

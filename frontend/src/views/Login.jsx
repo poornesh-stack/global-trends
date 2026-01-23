@@ -65,6 +65,8 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
     if (validateForm()) {
       const success = await login(formData.identifier, formData.password);
       if (success) {
