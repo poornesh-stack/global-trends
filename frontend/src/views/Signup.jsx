@@ -5,9 +5,7 @@ import {
   Button,
   Card,
   CardContent,
-  Checkbox,
   Divider,
-  FormControlLabel,
   IconButton,
   InputAdornment,
   Link,
@@ -36,16 +34,16 @@ export default function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false,
   });
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -96,10 +94,6 @@ export default function Signup() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -131,11 +125,13 @@ export default function Signup() {
     <Box
       sx={{
         minHeight: "100vh",
+        width: "100vw",
+        boxSizing: "border-box",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         background: "linear-gradient(135deg, #000068 0%, #07072e 100%)",
-        padding: 2,
+        overflow: "hidden",
       }}
     >
       <Card
@@ -143,7 +139,6 @@ export default function Signup() {
           maxWidth: 500,
           width: "100%",
           borderRadius: 3,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
           overflow: "hidden",
           my: 2,
         }}
@@ -164,7 +159,6 @@ export default function Signup() {
               borderRadius: "15px",
               background:
                 "conic-gradient(from 180deg at 50% 50%, #72E7FF 0deg, #7B61FF 140deg, #00FFC6 320deg)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
               margin: "0 auto 16px",
             }}
           />
@@ -204,12 +198,14 @@ export default function Signup() {
                 autoComplete="given-name"
                 autoFocus
                 disabled={isLoading}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonOutline sx={{ color: "text.secondary" }} />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutline sx={{ color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
 
@@ -223,12 +219,14 @@ export default function Signup() {
                 helperText={errors.lastName}
                 autoComplete="family-name"
                 disabled={isLoading}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonOutline sx={{ color: "text.secondary" }} />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonOutline sx={{ color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                  },
                 }}
               />
             </Box>
@@ -244,12 +242,14 @@ export default function Signup() {
               autoComplete="username"
               disabled={isLoading}
               sx={{ mb: 2.5 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonOutline sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <PersonOutline sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
 
@@ -265,12 +265,14 @@ export default function Signup() {
               autoComplete="email"
               disabled={isLoading}
               sx={{ mb: 2.5 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailOutlined sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailOutlined sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
 
@@ -286,23 +288,25 @@ export default function Signup() {
               autoComplete="new-password"
               disabled={isLoading}
               sx={{ mb: 2.5 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlined sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      disabled={isLoading}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlined sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        disabled={isLoading}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
 
@@ -318,62 +322,33 @@ export default function Signup() {
               autoComplete="new-password"
               disabled={isLoading}
               sx={{ mb: 2 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlined sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
-                      edge="end"
-                      disabled={isLoading}
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlined sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        edge="end"
+                        disabled={isLoading}
+                      >
+                        {showConfirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
-
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  disabled={isLoading}
-                  sx={{
-                    color: errors.agreeToTerms ? "error.main" : "inherit",
-                  }}
-                />
-              }
-              label={
-                <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  I agree to the{" "}
-                  <Link
-                    href="#"
-                    underline="hover"
-                    sx={{ color: "primary.main" }}
-                  >
-                    Terms and Conditions
-                  </Link>
-                </Typography>
-              }
-              sx={{ mb: errors.agreeToTerms ? 0 : 2 }}
-            />
-            {errors.agreeToTerms && (
-              <Typography
-                variant="caption"
-                sx={{ color: "error.main", display: "block", ml: 4, mb: 2 }}
-              >
-                {errors.agreeToTerms}
-              </Typography>
-            )}
 
             <Button
               type="submit"
@@ -384,7 +359,6 @@ export default function Signup() {
               sx={{
                 py: 1.5,
                 background: "linear-gradient(135deg, #000068 0%, #2626a5 100%)",
-                boxShadow: "0 6px 20px rgba(0,0,104,0.3)",
                 textTransform: "none",
                 fontSize: "1rem",
                 fontWeight: 600,
@@ -392,7 +366,6 @@ export default function Signup() {
                 "&:hover": {
                   background:
                     "linear-gradient(135deg, #2626a5 0%, #000068 100%)",
-                  boxShadow: "0 8px 25px rgba(0,0,104,0.4)",
                 },
                 "&:disabled": {
                   background: "rgba(0, 0, 104, 0.5)",

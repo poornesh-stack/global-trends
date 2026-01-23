@@ -76,12 +76,14 @@ export default function Login() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        height: "100vh",
         display: "flex",
+        boxSizing: "border-box",
         alignItems: "center",
         justifyContent: "center",
         background: "linear-gradient(135deg, #000068 0%, #07072e 100%)",
         padding: 2,
+        overflowY: "hidden",
       }}
     >
       <Card
@@ -89,7 +91,6 @@ export default function Login() {
           maxWidth: 450,
           width: "100%",
           borderRadius: 3,
-          boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
           overflow: "hidden",
         }}
       >
@@ -109,7 +110,6 @@ export default function Login() {
               borderRadius: "15px",
               background:
                 "conic-gradient(from 180deg at 50% 50%, #72E7FF 0deg, #7B61FF 140deg, #00FFC6 320deg)",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
               margin: "0 auto 16px",
             }}
           />
@@ -149,12 +149,14 @@ export default function Login() {
               autoFocus
               disabled={isLoading}
               sx={{ mb: 2.5 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <EmailOutlined sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailOutlined sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
 
@@ -169,40 +171,28 @@ export default function Login() {
               helperText={errors.password}
               autoComplete="current-password"
               disabled={isLoading}
-              sx={{ mb: 1 }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <LockOutlined sx={{ color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
-                      edge="end"
-                      disabled={isLoading}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
+              sx={{ mb: 1, pb: 1 }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockOutlined sx={{ color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        disabled={isLoading}
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
-
-            <Box sx={{ textAlign: "right", mb: 3 }}>
-              <Link
-                href="#"
-                underline="hover"
-                sx={{
-                  fontSize: "0.875rem",
-                  color: "primary.main",
-                  fontWeight: 500,
-                }}
-              >
-                Forgot password?
-              </Link>
-            </Box>
 
             <Button
               type="submit"
@@ -213,7 +203,6 @@ export default function Login() {
               sx={{
                 py: 1.5,
                 background: "linear-gradient(135deg, #000068 0%, #2626a5 100%)",
-                boxShadow: "0 6px 20px rgba(0,0,104,0.3)",
                 textTransform: "none",
                 fontSize: "1rem",
                 fontWeight: 600,
@@ -221,7 +210,6 @@ export default function Login() {
                 "&:hover": {
                   background:
                     "linear-gradient(135deg, #2626a5 0%, #000068 100%)",
-                  boxShadow: "0 8px 25px rgba(0,0,104,0.4)",
                 },
                 "&:disabled": {
                   background: "rgba(0, 0, 104, 0.5)",

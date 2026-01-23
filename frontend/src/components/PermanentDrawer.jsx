@@ -3,7 +3,6 @@ import {
   CloudOutlined,
   CurrencyExchangeOutlined,
   DashboardOutlined,
-  LogoutOutlined,
 } from "@mui/icons-material";
 import {
   AppBar,
@@ -136,68 +135,17 @@ export default function PermanentDrawer() {
               Contact
             </Button>
 
-            {/* User Info Display */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1.5,
-                ml: 2,
-                px: 2,
-                py: 0.5,
-                borderRadius: 999,
-                backgroundColor: alpha("#ffffff", 0.1),
-                border: "1px solid rgba(255,255,255,0.2)",
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  fontSize: "0.875rem",
-                  fontWeight: 600,
-                  background:
-                    "linear-gradient(135deg, #72E7FF 0%, #7B61FF 100%)",
-                }}
-              >
-                {getUserInitials()}
-              </Avatar>
-              <Box
-                sx={{ display: "flex", flexDirection: "column", lineHeight: 1 }}
-              >
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 600, fontSize: "0.875rem" }}
-                >
-                  {getDisplayName()}
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{ opacity: 0.8, fontSize: "0.7rem" }}
-                >
-                  {user?.email}
-                </Typography>
-              </Box>
-            </Box>
-
             {/* Logout Button */}
             <Button
               color="inherit"
               onClick={handleLogout}
-              startIcon={<LogoutOutlined />}
               sx={{
                 px: 2,
-                py: 0.75,
                 borderRadius: 999,
                 textTransform: "none",
-                fontWeight: 600,
-                fontSize: "0.875rem",
-                backgroundColor: alpha("#ffffff", 0.1),
-                border: "1px solid rgba(255,255,255,0.2)",
-                "&:hover": {
-                  backgroundColor: alpha("#ffffff", 0.2),
-                  border: "1px solid rgba(255,255,255,0.3)",
-                },
+                fontWeight: 500,
+                fontSize: "1rem",
+                "&:hover": { backgroundColor: alpha("#ffffff", 0.15) },
               }}
             >
               Logout
@@ -328,17 +276,15 @@ export default function PermanentDrawer() {
         {/* User Profile Card in Sidebar */}
         <Box
           sx={{
-            mx: 2,
-            mb: 2,
-            p: 2,
+            mx: 1.5,
+            mb: 1.5,
+            p: 1.5,
             borderRadius: 2,
             backgroundColor: alpha("#FFFFFF", 0.08),
             border: "1px solid rgba(255,255,255,0.12)",
           }}
         >
-          <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.5 }}
-          >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
             <Avatar
               sx={{
                 width: 40,
@@ -379,6 +325,22 @@ export default function PermanentDrawer() {
               </Typography>
             </Box>
           </Box>
+        </Box>
+
+        <Box
+          sx={{
+            mx: 1.5,
+            mb: 1.5,
+            p: 1.5,
+            borderRadius: 2,
+            backgroundColor: alpha("#FFFFFF", 0.08),
+            border: "1px solid rgba(255,255,255,0.12)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1.5,
+          }}
+        >
           <Chip
             label="Live"
             size="small"
