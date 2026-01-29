@@ -1,4 +1,4 @@
-![Screenshot 2026-01-29 at 2 28 32 PM](https://github.com/user-attachments/assets/47cadb40-77b4-4c58-9c87-a9a9456b51a1)<img width="1919" height="854" alt="Screenshot 2025-10-30 192914" src="https://github.com/user-attachments/assets/8770a514-8e57-40d0-83a4-21d473de5fb1" />
+<img width="1919" height="854" alt="Screenshot 2025-10-30 192914" src="https://github.com/user-attachments/assets/5618c65b-ad52-45a3-809e-bdabcbf211a0" />
 
 ![Screenshot 2026-01-29 at 2 28 32 PM](https://github.com/user-attachments/assets/46c37fc7-1567-49e2-8dd9-dbaa4ef2c103)
 
